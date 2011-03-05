@@ -2,3 +2,9 @@
 2011-02-03
 Initial Project in ajcodekatas
 IExpression, ICommand, IContext
+
+2011-03-05
+First commands and expressions
+Context with tests
+SetLocalVariable by number
+Add items from AjLanguage/AjSharp, to be reviewed

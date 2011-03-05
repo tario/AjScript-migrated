@@ -7,6 +7,8 @@
 
     public interface IContext
     {
+        void SetValue(int nvariable, object value);
 
+        object GetValue(int nvariable);
     }
 }
