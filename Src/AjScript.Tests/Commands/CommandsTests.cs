@@ -147,7 +147,7 @@
 
             ICommand endCommand = new SetLocalVariableCommand(0, new ArithmeticBinaryExpression(ArithmeticOperator.Add, new LocalVariableExpression(0), new ConstantExpression(1)));
 
-            ForCommand forcmd = new ForCommand(initialCommand, condition, endCommand, addToY, 0);
+            ForCommand forcmd = new ForCommand(initialCommand, condition, endCommand, addToY);
 
             Context context = new Context(2);
 

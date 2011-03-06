@@ -17,7 +17,7 @@
         private static string[] otherOperators = new string[] { "++", "--", "<=", ">=", "==", "!=", "&&", "||", "*=", "/=", "%=", "+=", "-=" };
 
         private TextReader reader;
-        private Token lastToken;
+        private Stack<Token> tokens;
         private char lastChar;
         private bool hasChar;
         private bool isConsole;
@@ -55,13 +55,8 @@
 
         public Token NextToken()
         {
-            if (this.lastToken != null)
-            {
-                Token t = this.lastToken;
-                this.lastToken = null;
-
-                return t;
-            }
+            if (this.tokens != null && this.tokens.Count>0)
+                return this.tokens.Pop();
 
             char ch;
 
@@ -121,14 +116,12 @@
             }
         }
 
-        internal void PushToken(Token token)
+        public void PushToken(Token token)
         {
-            if (this.lastToken != null)
-            {
-                throw new InvalidOperationException();
-            }
+            if (this.tokens == null)
+                this.tokens = new Stack<Token>();
 
-            this.lastToken = token;
+            this.tokens.Push(token);
         }
 
         private Token NextOperator(char ch)

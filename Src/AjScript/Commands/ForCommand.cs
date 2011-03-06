@@ -13,15 +13,13 @@
         private IExpression condition;
         private ICommand body;
         private ICommand endCommand;
-        private int nvariables;
 
-        public ForCommand(ICommand initialCommand, IExpression condition, ICommand endCommand, ICommand body, int nvariables)
+        public ForCommand(ICommand initialCommand, IExpression condition, ICommand endCommand, ICommand body)
         {
             this.initialCommand = initialCommand;
             this.condition = condition;
             this.endCommand = endCommand;
             this.body = body;
-            this.nvariables = nvariables;
         }
 
         public ICommand InitialCommand { get { return this.initialCommand; } }
@@ -32,21 +30,17 @@
 
         public ICommand Body { get { return this.body; } }
 
-        public int NVariables { get { return this.nvariables; } }
-
         public void Execute(IContext context)
         {
-            IContext newContext = new Context(context, this.nvariables);
-
             if (this.initialCommand != null)
-                this.initialCommand.Execute(newContext);
+                this.initialCommand.Execute(context);
 
-            while (this.condition == null || Predicates.IsTrue(this.condition.Evaluate(newContext)))
+            while (this.condition == null || Predicates.IsTrue(this.condition.Evaluate(context)))
             {
                 if (this.body != null)
-                    this.body.Execute(newContext);
+                    this.body.Execute(context);
                 if (this.endCommand != null)
-                    this.endCommand.Execute(newContext);
+                    this.endCommand.Execute(context);
             }
         }
     }

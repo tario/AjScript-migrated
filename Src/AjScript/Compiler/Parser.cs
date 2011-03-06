@@ -150,9 +150,6 @@
             if (token.TokenType != type)
                 return false;
 
-            if (type == TokenType.Name)
-                return token.Value.Equals(value, StringComparison.InvariantCultureIgnoreCase);
-
             return token.Value.Equals(value);
         }
 
@@ -507,9 +504,8 @@
             return new WhileCommand(condition, command);
         }
 
-        private ICommand ParseForEachCommand()
+        private ICommand ParseForInCommand()
         {
-            this.Parse(TokenType.Separator, "(");
             string name = this.ParseName();
 
             if (name == "var")
@@ -534,6 +530,26 @@
         private ICommand ParseForCommand()
         {
             this.Parse(TokenType.Separator, "(");
+            
+            Token token = this.lexer.NextToken();
+
+            if (token.TokenType == TokenType.Name && token.Value == "var")
+            {
+                string name = this.ParseName();
+
+                if (this.TryParse(TokenType.Name, "in"))
+                {
+                    this.lexer.PushToken(new Token() { TokenType = TokenType.Name, Value = "in" });
+                    this.lexer.PushToken(new Token() { TokenType = TokenType.Name, Value = name });
+                    this.lexer.PushToken(token);
+
+                    return this.ParseForInCommand();
+                }
+
+                this.lexer.PushToken(new Token() { TokenType = TokenType.Name, Value = name });
+                this.lexer.PushToken(token);
+            }
+
             ICommand initial = this.ParseSimpleCommand();
             this.Parse(TokenType.Separator, ";");
             IExpression condition = this.ParseExpression();
@@ -542,8 +558,7 @@
             this.Parse(TokenType.Separator, ")");
             ICommand command = this.ParseCommand();
 
-            // TODO: Review set no. of variables
-            return new ForCommand(initial, condition, endcmd, command, 0);
+            return new ForCommand(initial, condition, endcmd, command);
         }
 
         private ICommand ParseVarCommand()
@@ -650,15 +665,6 @@
 
             if (token == null)
                 return false;
-
-            if (type == TokenType.Name)
-            {
-                foreach (string value in values)
-                    if (IsName(token, value))
-                        return true;
-
-                return false;
-            }
 
             if (token.TokenType == type)
                 foreach (string value in values)

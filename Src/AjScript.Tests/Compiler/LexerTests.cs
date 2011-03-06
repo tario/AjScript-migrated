@@ -96,6 +96,31 @@
             ParseNameTokens("foo // this is a comment\r\n bar", "foo", "bar");
         }
 
+        [TestMethod]
+        public void PushToken()
+        {
+            Lexer lexer = new Lexer("");
+            Token token = new Token() { TokenType = TokenType.Name, Value = "name" };
+
+            lexer.PushToken(token);
+
+            Assert.AreEqual(token, lexer.NextToken());
+        }
+
+        [TestMethod]
+        public void PushTwoToken2()
+        {
+            Lexer lexer = new Lexer("");
+            Token token = new Token() { TokenType = TokenType.Name, Value = "name" };
+            Token token2 = new Token() { TokenType = TokenType.Name, Value = "name2" };
+
+            lexer.PushToken(token);
+            lexer.PushToken(token2);
+
+            Assert.AreEqual(token2, lexer.NextToken());
+            Assert.AreEqual(token, lexer.NextToken());
+        }
+
         private static void ParseToken(string text, TokenType type, string value)
         {
             using (Lexer lexer = new Lexer(text))

@@ -362,7 +362,7 @@
         [TestMethod]
         public void ParseSimpleForInWithLocalVar()
         {
-            ICommand command = ParseCommand("for (var a in b) c=c+a;");
+            ICommand command = ParseCommand("for (var x in b) c=c+x;");
 
             Assert.IsNotNull(command);
             Assert.IsInstanceOfType(command, typeof(ForEachCommand));
@@ -438,7 +438,7 @@
         [TestMethod]
         public void ParseSimpleDotExpression()
         {
-            IExpression expression = ParseExpression("a.Length");
+            IExpression expression = ParseExpression("a.length");
 
             Assert.IsNotNull(expression);
             Assert.IsInstanceOfType(expression, typeof(DotExpression));            
