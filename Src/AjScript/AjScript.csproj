@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CompositeCommand.cs" />
+    <Compile Include="Commands\DefineFunctionCommand.cs" />
     <Compile Include="Commands\ExpressionCommand.cs" />
     <Compile Include="Commands\ForCommand.cs" />
     <Compile Include="Commands\ForEachCommand.cs" />
@@ -83,7 +84,6 @@
     <Compile Include="Expressions\GetValueExpression.cs" />
     <Compile Include="Expressions\IExpression.cs" />
     <Compile Include="Expressions\IncrementExpression.cs" />
-    <Compile Include="Expressions\InvokeExpression.cs" />
     <Compile Include="Expressions\NotExpression.cs" />
     <Compile Include="Expressions\OrExpression.cs" />
     <Compile Include="Expressions\UnaryExpression.cs" />
@@ -97,6 +97,7 @@
     <Compile Include="Language\IncrementOperator.cs" />
     <Compile Include="Language\IObject.cs" />
     <Compile Include="Language\IReference.cs" />
+    <Compile Include="Language\Undefined.cs" />
     <Compile Include="ObjectUtilities.cs" />
     <Compile Include="Predicates.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

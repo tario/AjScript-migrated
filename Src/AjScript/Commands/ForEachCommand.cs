@@ -9,42 +9,29 @@
 
     public class ForEachCommand : ICommand
     {
+        private int nvariable;
         private IExpression expression;
         private ICommand command;
-        private bool localvar;
 
-        public ForEachCommand(IExpression expression, ICommand command)
-            : this(expression, command, false)
+        public ForEachCommand(int nvariable, IExpression expression, ICommand command)
         {
-        }
-
-        public ForEachCommand(IExpression expression, ICommand command, bool localvar)
-        {
+            this.nvariable = nvariable;
             this.expression = expression;
             this.command = command;
-            this.localvar = localvar;
         }
+
+        public int NVariable { get { return this.nvariable; } }
 
         public IExpression Expression { get { return this.expression; } }
 
         public ICommand Command { get { return this.command; } }
 
-        public bool LocalVariable { get { return this.localvar; } }
-
         public void Execute(IContext context)
         {
-            IContext newContext = context;
-
-            if (this.localvar)
+            foreach (object result in (IEnumerable) this.expression.Evaluate(context))
             {
-                newContext = new Context(context, 1);
-                newContext.SetValue(0, null);
-            }
-
-            foreach (object result in (IEnumerable) this.expression.Evaluate(newContext))
-            {
-                newContext.SetValue(0, result);
-                this.command.Execute(newContext);
+                context.SetValue(this.nvariable, result);
+                this.command.Execute(context);
             }
         }
     }

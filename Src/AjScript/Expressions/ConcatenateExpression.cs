@@ -7,7 +7,6 @@
 
     using Microsoft.VisualBasic.CompilerServices;
 
-    [Serializable]
     public class ConcatenateExpression : BinaryExpression
     {
         public ConcatenateExpression(IExpression left, IExpression right)

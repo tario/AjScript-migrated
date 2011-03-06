@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Text;
 
-    [Serializable]
     public abstract class UnaryExpression : IExpression
     {
         private IExpression expression;

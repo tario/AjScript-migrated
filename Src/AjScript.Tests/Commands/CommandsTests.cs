@@ -119,7 +119,7 @@
             ICommand setX = new SetLocalVariableCommand(0, addToX);
             IExpression values = new ConstantExpression(new int [] { 1, 2, 3 } );
 
-            ForEachCommand foreachcmd = new ForEachCommand(values, setX);
+            ForEachCommand foreachcmd = new ForEachCommand(1, values, setX);
 
             Context context = new Context(2);
 

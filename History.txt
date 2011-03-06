@@ -8,3 +8,8 @@ First commands and expressions
 Context with tests
 SetLocalVariable by number
 Add items from AjLanguage/AjSharp, to be reviewed
+
+2011-03-06
+Local variables in parser, with tests
+var x=1;
+for commands (WIP)

@@ -6,7 +6,6 @@
     using System.Text;
     using System.Collections;
 
-    [Serializable]
     public class DotExpression : IExpression
     {
         private IExpression expression;

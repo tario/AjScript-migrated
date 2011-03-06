@@ -14,6 +14,7 @@
     public class Parser : IDisposable
     {
         private Lexer lexer;
+        private IList<string> variables;
 
         public Parser(string text)
             : this(new Lexer(text))
@@ -50,6 +51,9 @@
 
                 if (token.Value == "return")
                     return this.ParseReturnCommand();
+
+                if (token.Value == "var")
+                    return this.ParseVarCommand();
             }
 
             if (token.TokenType == TokenType.Separator && token.Value == "{")
@@ -70,6 +74,22 @@
         public IExpression ParseExpression()
         {
             return this.ParseBinaryLogicalExpressionLevelOne();
+        }
+
+        public void DefineVariable(string name)
+        {
+            if (this.variables == null)
+                this.variables = new List<string>();
+
+            this.variables.Add(name);
+        }
+
+        public int GetVariableOffset(string name)
+        {
+            if (this.variables == null)
+                return -1;
+
+            return this.variables.IndexOf(name);
         }
 
         public void Dispose()
@@ -413,33 +433,20 @@
                     double realValue = Double.Parse(token.Value, System.Globalization.CultureInfo.InvariantCulture);
                     return new ConstantExpression(realValue);
                 case TokenType.String:
-                    IList<string> parts = StringUtilities.SplitText(token.Value);
-
-                    if (parts.Count == 1)
-                        return new ConstantExpression(token.Value);
-
-                    IExpression strexpr = new ConstantExpression(parts[0]);
-
-                    for (int k = 1; k < parts.Count; k++)
-                        if ((k % 2) == 0)
-                            strexpr = new ConcatenateExpression(strexpr, new ConstantExpression(parts[k]));
-                        else
-                        {
-                            Parser parser = new Parser(parts[k]);
-                            strexpr = new ConcatenateExpression(strexpr, parser.ParseExpression());
-                        }
-
-                    return strexpr;
+                    return new ConstantExpression(token.Value);
                 case TokenType.Name:
                     if (this.TryParse(TokenType.Separator, "("))
                     {
                         List<IExpression> arguments = this.ParseArgumentList();
-                        // TODO Review: set no. of variable
-                        return new InvokeExpression(0, arguments);
+                        throw new NotImplementedException();
                     }
 
-                    // TODO Review: set no. of variable
-                    return new LocalVariableExpression(0);
+                    int nvariable = this.GetVariableOffset(token.Value);
+
+                    if (nvariable < 0)
+                        throw new ParserException(string.Format("Undefined Variable '{0}'", token.Value));
+
+                    return new LocalVariableExpression(nvariable);
             }
 
             throw new UnexpectedTokenException(token);
@@ -504,20 +511,24 @@
         {
             this.Parse(TokenType.Separator, "(");
             string name = this.ParseName();
-            bool localvar = false;
 
             if (name == "var")
             {
-                localvar = true;
                 name = this.ParseName();
+                this.DefineVariable(name);
             }
+
+            int nvariable = this.GetVariableOffset(name);
+
+            if (nvariable < 0)
+                throw new ParserException(string.Format("Undefined Variable {0}", name));
 
             this.Parse(TokenType.Name, "in");
             IExpression values = this.ParseExpression();
             this.Parse(TokenType.Separator, ")");
             ICommand command = this.ParseCommand();
 
-            return new ForEachCommand(values, command, localvar);
+            return new ForEachCommand(nvariable, values, command);
         }
 
         private ICommand ParseForCommand()
@@ -538,6 +549,8 @@
         private ICommand ParseVarCommand()
         {
             string name = this.ParseName();
+            this.DefineVariable(name);
+
             IExpression expression = null;
 
             if (this.TryParse(TokenType.Operator, "="))
@@ -545,9 +558,14 @@
                 this.lexer.NextToken();
                 expression = this.ParseExpression();
             }
+            else
+            {
+                expression = new ConstantExpression(Undefined.Instance);
+            }
 
-            throw new NotImplementedException();
-            //return new VarCommand(name, expression);
+            this.Parse(TokenType.Separator, ";");
+
+            return new SetLocalVariableCommand(this.GetVariableOffset(name), expression);
         }
 
         private void ParseMemberVariable(IList<string> memberNames, IList<IExpression> memberExpressions)

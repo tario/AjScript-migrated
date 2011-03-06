@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Text;
 
-    [Serializable]
     public class EndOfInputException : Exception
     {
         public EndOfInputException()

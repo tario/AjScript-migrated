@@ -9,7 +9,6 @@
 
     using Microsoft.VisualBasic.CompilerServices;
 
-    [Serializable]
     public class CompareExpression : BinaryExpression
     {
         private Func<object, object, bool, object> function;

@@ -8,7 +8,6 @@
     using AjScript.Expressions;
     using AjScript.Language;
 
-    [Serializable]
     public class SetValueCommand : ICommand
     {
         private IExpression leftValue;
