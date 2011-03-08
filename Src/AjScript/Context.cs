@@ -28,5 +28,10 @@
         {
             return this.values[nvariable];
         }
+
+        public object GetValue(string name)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

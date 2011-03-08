@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AjScript.Console", "AjScript.Console\AjScript.Console.csproj", "{1BC77A29-8095-43A7-974A-0AB8ED48C17D}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = AjScript.vsmdi
@@ -28,6 +30,10 @@ Global
 		{C40B5606-239F-44D9-B253-BA95BCBE3A00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C40B5606-239F-44D9-B253-BA95BCBE3A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C40B5606-239F-44D9-B253-BA95BCBE3A00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BC77A29-8095-43A7-974A-0AB8ED48C17D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BC77A29-8095-43A7-974A-0AB8ED48C17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BC77A29-8095-43A7-974A-0AB8ED48C17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BC77A29-8095-43A7-974A-0AB8ED48C17D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

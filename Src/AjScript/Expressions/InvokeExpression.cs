@@ -8,26 +8,32 @@
 
     using AjScript.Commands;
     using AjScript.Language;
-    using AjScript.Expressions;
 
+    [Serializable]
     public class InvokeExpression : IExpression
     {
-        private int nvariable;
+        private IExpression expression;
         private ICollection<IExpression> arguments;
 
-        public InvokeExpression(int nvariable, ICollection<IExpression> arguments)
+        public InvokeExpression(IExpression expression, ICollection<IExpression> arguments)
         {
-            this.nvariable = nvariable;
+            this.expression = expression;
             this.arguments = arguments;
         }
 
-        public int NVariable { get { return this.nvariable; } }
+        public IExpression Expression { get { return this.expression; } }
 
         public ICollection<IExpression> Arguments { get { return this.arguments; } }
 
         public object Evaluate(IContext context)
         {
-            ICallable callable = (ICallable)context.GetValue(this.nvariable);
+            object obj = null;
+            ICallable callable;
+
+            if (this.expression is ArrayExpression)
+                callable = (ICallable)((ArrayExpression)this.expression).Evaluate(context, ref obj);
+            else
+                callable = (ICallable)this.expression.Evaluate(context);
 
             List<object> parameters = new List<object>();
 
@@ -37,6 +43,15 @@
 
                 parameters.Add(parameter);
             }
+
+            if (obj != null && obj is DynamicObject)
+            {
+                DynamicObject dobj = (DynamicObject)obj;
+                return dobj.Invoke(callable, parameters.ToArray());
+            }
+
+            if (callable is ILocalCallable)
+                return callable.Invoke(context, parameters.ToArray());
 
             return callable.Invoke(parameters.ToArray());
         }

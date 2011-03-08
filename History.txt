@@ -13,3 +13,10 @@ Add items from AjLanguage/AjSharp, to be reviewed
 Local variables in parser, with tests
 var x=1;
 for commands (WIP)
+implementing for (var k, for (k in
+
+2011-03-08
+Fix for (... parser tests
+NamedVariableExpression
+WriteFunction primitive with tests
+AjScript.Console (without var support)

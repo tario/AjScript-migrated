@@ -10,5 +10,7 @@
         void SetValue(int nvariable, object value);
 
         object GetValue(int nvariable);
+
+        object GetValue(string name);
     }
 }

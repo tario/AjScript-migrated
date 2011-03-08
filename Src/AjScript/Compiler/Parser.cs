@@ -414,9 +414,9 @@
                 case TokenType.Separator:
                     if (token.Value == "(")
                     {
-                        IExpression expr = this.ParseExpression();
+                        IExpression expression = this.ParseExpression();
                         this.Parse(TokenType.Separator, ")");
-                        return expr;
+                        return expression;
                     }
 
                     break;
@@ -432,18 +432,22 @@
                 case TokenType.String:
                     return new ConstantExpression(token.Value);
                 case TokenType.Name:
-                    if (this.TryParse(TokenType.Separator, "("))
-                    {
-                        List<IExpression> arguments = this.ParseArgumentList();
-                        throw new NotImplementedException();
-                    }
+                    IExpression expr = null;
 
                     int nvariable = this.GetVariableOffset(token.Value);
 
                     if (nvariable < 0)
-                        throw new ParserException(string.Format("Undefined Variable '{0}'", token.Value));
+                        expr = new NamedVariableExpression(token.Value);
+                    else
+                        expr = new LocalVariableExpression(nvariable);
 
-                    return new LocalVariableExpression(nvariable);
+                    if (this.TryParse(TokenType.Separator, "("))
+                    {
+                        List<IExpression> arguments = this.ParseArgumentList();
+                        expr = new InvokeExpression(expr, arguments);
+                    }
+
+                    return expr;
             }
 
             throw new UnexpectedTokenException(token);
@@ -530,7 +534,7 @@
         private ICommand ParseForCommand()
         {
             this.Parse(TokenType.Separator, "(");
-            
+
             Token token = this.lexer.NextToken();
 
             if (token.TokenType == TokenType.Name && token.Value == "var")
@@ -539,7 +543,6 @@
 
                 if (this.TryParse(TokenType.Name, "in"))
                 {
-                    this.lexer.PushToken(new Token() { TokenType = TokenType.Name, Value = "in" });
                     this.lexer.PushToken(new Token() { TokenType = TokenType.Name, Value = name });
                     this.lexer.PushToken(token);
 
@@ -551,7 +554,7 @@
             }
 
             ICommand initial = this.ParseSimpleCommand();
-            this.Parse(TokenType.Separator, ";");
+            //this.Parse(TokenType.Separator, ";");
             IExpression condition = this.ParseExpression();
             this.Parse(TokenType.Separator, ";");
             ICommand endcmd = this.ParseSimpleCommand();
