@@ -30,3 +30,4 @@ NewExpression
 Function, IFunction
 ReturnValue
 ObjectFunction
+Object defined in AjScript.Console for x = new Object();

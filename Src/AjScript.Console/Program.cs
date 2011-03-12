@@ -16,6 +16,8 @@
             Parser parser = new Parser(System.Console.In, context);
             context.DefineVariable("write");
             context.SetValue("write", new WriteFunction());
+            context.DefineVariable("Object");
+            context.SetValue("Object", new ObjectFunction());
 
             for (ICommand cmd = parser.ParseCommand(); cmd != null; cmd = parser.ParseCommand())
                 cmd.Execute(context);
