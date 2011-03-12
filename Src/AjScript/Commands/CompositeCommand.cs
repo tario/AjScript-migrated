@@ -23,7 +23,12 @@
         public void Execute(IContext context)
         {
             foreach (ICommand command in this.commands)
+            {
                 command.Execute(context);
+
+                if (context.ReturnValue != null)
+                    return;
+            }
         }
     }
 }

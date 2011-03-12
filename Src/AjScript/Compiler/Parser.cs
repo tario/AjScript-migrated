@@ -14,21 +14,32 @@
     public class Parser : IDisposable
     {
         private Lexer lexer;
-        private IList<string> variables;
+        private IContext context;
 
         public Parser(string text)
-            : this(new Lexer(text))
+            : this(new Lexer(text), new Context(0))
         {
         }
 
         public Parser(TextReader reader)
-            : this(new Lexer(reader))
+            : this(new Lexer(reader), new Context(0))
         {
         }
 
-        public Parser(Lexer lexer)
+        public Parser(string text, IContext context)
+            : this(new Lexer(text), context)
+        {
+        }
+
+        public Parser(TextReader reader, IContext context)
+            : this(new Lexer(reader), context)
+        {
+        }
+
+        public Parser(Lexer lexer, IContext context)
         {
             this.lexer = lexer;
+            this.context = context;
         }
 
         public ICommand ParseCommand()
@@ -78,24 +89,18 @@
 
         public void DefineVariable(string name)
         {
-            if (this.variables == null)
-                this.variables = new List<string>();
-
-            this.variables.Add(name);
-        }
-
-        public int GetVariableOffset(string name)
-        {
-            if (this.variables == null)
-                return -1;
-
-            return this.variables.IndexOf(name);
+            this.context.DefineVariable(name);
         }
 
         public void Dispose()
         {
             if (this.lexer != null)
                 this.lexer.Dispose();
+        }
+
+        public int GetVariableOffset(string name)
+        {
+            return this.context.GetVariableOffset(name);
         }
 
         private ICommand ParseSimpleCommand()
@@ -317,15 +322,6 @@
                 return new IncrementExpression(expression, op);
             }
 
-            if (this.TryParse(TokenType.Operator, "<-", "@"))
-            {
-                this.lexer.NextToken();
-
-                IExpression expression = this.ParseTermExpression();
-
-                return new GetValueExpression(expression);
-            }
-
             IExpression termexpr = this.ParseTermExpression();
 
             if (this.TryParse(TokenType.Operator, "++", "--"))
@@ -342,6 +338,9 @@
 
         private IExpression ParseTermExpression()
         {
+            if (this.TryParse(TokenType.Name, "new"))
+                return ParseNewExpression();
+
             IExpression expression = this.ParseSimpleTermExpression();
 
             while (this.TryParse(TokenType.Operator, ".") || this.TryParse(TokenType.Separator, "[", "("))
@@ -362,6 +361,15 @@
             }
 
             return expression;
+        }
+
+        private IExpression ParseNewExpression()
+        {
+            this.Parse(TokenType.Name, "new");
+
+            string name = this.ParseName();
+            List<IExpression> arguments = this.ParseArgumentList();
+            return new NewExpression(name, arguments);
         }
 
         private List<IExpression> ParseArgumentList()

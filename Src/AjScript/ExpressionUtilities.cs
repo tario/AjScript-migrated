@@ -9,13 +9,19 @@
     using AjScript.Expressions;
     using AjScript.Language;
 
-    public class ExpressionUtilities
+    public static class ExpressionUtilities
     {
         public static void SetValue(IExpression expression, object value, IContext context)
         {
             if (expression is LocalVariableExpression)
             {
                 SetValue((LocalVariableExpression)expression, value, context);
+                return;
+            }
+
+            if (expression is NamedVariableExpression)
+            {
+                SetValue((NamedVariableExpression)expression, value, context);
                 return;
             }
 
@@ -64,6 +70,17 @@
         private static void SetValue(LocalVariableExpression expression, object value, IContext context)
         {
             context.SetValue(expression.NVariable, value);
+        }
+
+        private static void SetValue(NamedVariableExpression expression, object value, IContext context)
+        {
+            string name = expression.Name;
+            int nposition = context.GetVariableOffset(name);
+
+            if (nposition < 0)
+                nposition = context.DefineVariable(name);
+
+            context.SetValue(nposition, value);
         }
 
         private static void SetValue(DotExpression expression, object value, IContext context)

@@ -53,7 +53,9 @@
 
             ICallable method = (ICallable)value;
 
-            throw new NotImplementedException();
+            return method.Invoke(null, this, parameters);
+
+            //TODO set up object environment if needed
             //IContext objenv = new ObjectEnvironment(this, method.Environment);
 
             //return method.Invoke(objenv, parameters);
@@ -61,10 +63,7 @@
 
         public virtual object Invoke(ICallable method, object[] parameters)
         {
-            throw new NotImplementedException();
-            //IBindingEnvironment objenv = new ObjectEnvironment(this, method.Environment);
-
-            //return method.Invoke(objenv, parameters);
+            return method.Invoke(null, this, parameters);
         }
     }
 }

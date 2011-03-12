@@ -50,10 +50,7 @@
                 return dobj.Invoke(callable, parameters.ToArray());
             }
 
-            if (callable is ILocalCallable)
-                return callable.Invoke(context, parameters.ToArray());
-
-            return callable.Invoke(parameters.ToArray());
+            return callable.Invoke(context, null, parameters.ToArray());
         }
     }
 }

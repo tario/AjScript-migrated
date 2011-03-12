@@ -12,10 +12,10 @@
     {
         static void Main(string[] args)
         {
-            Parser parser = new Parser(System.Console.In);
-            IContext context = new Context(1);
-            context.SetValue(0, new WriteFunction());
-            parser.DefineVariable("write");
+            IContext context = new Context(0);
+            Parser parser = new Parser(System.Console.In, context);
+            context.DefineVariable("write");
+            context.SetValue("write", new WriteFunction());
 
             for (ICommand cmd = parser.ParseCommand(); cmd != null; cmd = parser.ParseCommand())
                 cmd.Execute(context);

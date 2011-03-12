@@ -6,6 +6,7 @@
     using System.Text;
 
     using AjScript.Expressions;
+    using AjScript.Language;
 
     public class ReturnCommand : ICommand
     {
@@ -25,7 +26,7 @@
 
         public void Execute(IContext context)
         {
-            throw new NotImplementedException();
+            context.ReturnValue = new ReturnValue(this.expression.Evaluate(context));
         }
     }
 }

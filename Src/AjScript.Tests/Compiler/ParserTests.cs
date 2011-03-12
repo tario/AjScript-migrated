@@ -627,6 +627,19 @@
             Assert.IsInstanceOfType(orexpr.RightExpression, typeof(CompareExpression));
         }
 
+        [TestMethod]
+        public void ParseNewObject()
+        {
+            IExpression expression = ParseExpression("new Object()");
+
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(NewExpression));
+
+            NewExpression newexpr = (NewExpression)expression;
+
+            Assert.AreEqual("Object", newexpr.TypeName);
+        }
+
         private IExpression ParseExpression(string text)
         {
             this.CreateParser(text);

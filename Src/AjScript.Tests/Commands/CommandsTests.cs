@@ -67,7 +67,7 @@
 
             command.Execute(context);
 
-            Assert.IsNull(context.GetValue(0));
+            Assert.AreEqual(Undefined.Instance, context.GetValue(0));
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@
 
             command.Execute(context);
 
-            Assert.IsNull(context.GetValue(0));
+            Assert.AreEqual(Undefined.Instance, context.GetValue(0));
             Assert.AreEqual(2, context.GetValue(1));
         }
 

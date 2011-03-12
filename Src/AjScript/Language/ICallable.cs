@@ -11,8 +11,6 @@
 
         IContext Context { get; }
 
-        object Invoke(IContext context, object[] arguments);
-
-        object Invoke(object[] arguments);
+        object Invoke(IContext context, object @this, object[] arguments);
     }
 }

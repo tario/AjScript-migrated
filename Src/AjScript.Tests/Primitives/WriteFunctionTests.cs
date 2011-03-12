@@ -16,7 +16,7 @@
         {
             StringWriter writer = new StringWriter();
             WriteFunction wfunc = new WriteFunction(writer);
-            wfunc.Invoke(new object[] { "Hello!" });
+            wfunc.Invoke(null, null, new object[] { "Hello!" });
             writer.Close();
             Assert.AreEqual("Hello!", writer.ToString());
         }

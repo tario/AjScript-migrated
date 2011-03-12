@@ -31,16 +31,10 @@
             get { throw new NotImplementedException(); }
         }
 
-        public object Invoke(IContext context, object[] arguments)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object Invoke(object[] arguments)
+        public object Invoke(IContext context, object @this, object[] arguments)
         {
             this.writer.Write(arguments[0]);
-
-            // TODO: review return value
+            // TODO Review return value
             return null;
         }
     }

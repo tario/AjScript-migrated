@@ -5,7 +5,8 @@
     using System.Linq;
     using System.Text;
 
-    public interface ILocalCallable
+    public interface IFunction
     {
+        object NewInstance(object[] parameters);
     }
 }
