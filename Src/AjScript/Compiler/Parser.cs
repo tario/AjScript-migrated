@@ -439,6 +439,14 @@
                     return new ConstantExpression(realValue);
                 case TokenType.String:
                     return new ConstantExpression(token.Value);
+                case TokenType.Object:
+                    if (token.Value == "null")
+                        return new ConstantExpression(null);
+
+                    if (token.Value == "undefined")
+                        return new ConstantExpression(Undefined.Instance);
+
+                    break;
                 case TokenType.Name:
                     IExpression expr = null;
 

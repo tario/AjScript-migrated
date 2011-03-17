@@ -31,3 +31,10 @@ Function, IFunction
 ReturnValue
 ObjectFunction
 Object defined in AjScript.Console for x = new Object();
+
+2011-03-17
+WriteLine
+Print Initial Message in AjScript.Console
+Expression Evaluation Tests
+null, undefined as constant expressions
+

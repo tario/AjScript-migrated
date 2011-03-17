@@ -7,16 +7,16 @@
     using AjScript.Language;
     using System.IO;
 
-    public class WriteFunction : ICallable
+    public class WriteLineFunction : ICallable
     {
         private TextWriter writer;
 
-        public WriteFunction()
+        public WriteLineFunction()
             : this(System.Console.Out)
         {
         }
 
-        public WriteFunction(TextWriter writer)
+        public WriteLineFunction(TextWriter writer)
         {
             this.writer = writer;
         }
@@ -36,6 +36,8 @@
             if (arguments!=null)
                 foreach (object argument in arguments)
                     this.writer.Write(argument);
+
+            this.writer.WriteLine();
 
             // TODO Review return value
             return null;

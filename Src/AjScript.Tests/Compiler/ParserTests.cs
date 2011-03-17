@@ -97,6 +97,44 @@
         }
 
         [TestMethod]
+        public void ParseNullAsConstant()
+        {
+            IExpression expression = ParseExpression("null");
+
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(ConstantExpression));
+
+            ConstantExpression consexpr = (ConstantExpression)expression;
+            Assert.IsNull(consexpr.Value);
+        }
+
+        [TestMethod]
+        public void ParseFalseAsConstant()
+        {
+            IExpression expression = ParseExpression("false");
+
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(ConstantExpression));
+
+            ConstantExpression consexpr = (ConstantExpression)expression;
+            Assert.IsInstanceOfType(consexpr.Value, typeof(bool));
+            Assert.IsFalse((bool)consexpr.Value);
+        }
+
+        [TestMethod]
+        public void ParseTrueAsConstant()
+        {
+            IExpression expression = ParseExpression("true");
+
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(ConstantExpression));
+
+            ConstantExpression consexpr = (ConstantExpression)expression;
+            Assert.IsInstanceOfType(consexpr.Value, typeof(bool));
+            Assert.IsTrue((bool)consexpr.Value);
+        }
+
+        [TestMethod]
         public void ParseSecondDefinedVariable()
         {
             IExpression expression = ParseExpression("b");

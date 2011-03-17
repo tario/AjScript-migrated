@@ -21,6 +21,7 @@
         private char lastChar;
         private bool hasChar;
         private bool isConsole;
+        private bool isFirstChar = true;
 
         public Lexer(string text)
         {
@@ -368,8 +369,8 @@
             if (name == "true" || name == "false")
                 token.TokenType = TokenType.Boolean;
 
-            if (name == "@" || name == "@@")
-                throw new InvalidInputException(name);
+            if (name == "null" || name == "undefined")
+                token.TokenType = TokenType.Object;
 
             return token;
         }
@@ -451,11 +452,13 @@
 
             int ch;
 
-            if (this.isConsole && this.reader.Peek() < 0)
+            if (this.isConsole && (this.isFirstChar || this.reader.Peek() < 0))
             {
                 Console.Out.Write("> ");
                 Console.Out.Flush();
             }
+
+            this.isFirstChar = false;
 
             ch = this.reader.Read();
 

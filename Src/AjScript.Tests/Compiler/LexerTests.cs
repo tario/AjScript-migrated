@@ -43,6 +43,25 @@
         }
 
         [TestMethod]
+        public void ParseBooleanValues()
+        {
+            ParseToken("false", TokenType.Boolean, "false");
+            ParseToken("true", TokenType.Boolean, "true");
+        }
+
+        [TestMethod]
+        public void ParseNull()
+        {
+            ParseToken("null", TokenType.Object, "null");
+        }
+
+        [TestMethod]
+        public void ParseUndefined()
+        {
+            ParseToken("undefined", TokenType.Object, "undefined");
+        }
+
+        [TestMethod]
         public void ParseString()
         {
             ParseToken("\"foo\"", TokenType.String, "foo");
