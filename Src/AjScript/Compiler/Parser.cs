@@ -327,15 +327,23 @@
                 {
                     this.lexer.NextToken();
                     string name = this.ParseName();
-                    List<IExpression> arguments = null;
+                    IList<IExpression> arguments = null;
 
                     if (this.TryParse(TokenType.Separator, "("))
                         arguments = this.ParseArgumentList();
 
                     expression = new DotExpression(expression, name, arguments);
+                    continue;
                 }
-                else
-                    expression = new ArrayExpression(expression, this.ParseArrayArgumentList());
+
+                if (this.TryParse(TokenType.Separator, "("))
+                {
+                    IList<IExpression> arguments = this.ParseArgumentList();
+                    expression = new InvokeExpression(expression, arguments);
+                    continue;
+                }
+
+                expression = new ArrayExpression(expression, this.ParseArrayArgumentList());
             }
 
             return expression;
@@ -346,11 +354,19 @@
             this.Parse(TokenType.Name, "new");
 
             string name = this.ParseName();
-            List<IExpression> arguments = this.ParseArgumentList();
+            IList<IExpression> arguments = this.ParseArgumentList();
             return new NewExpression(name, arguments);
         }
 
-        private List<IExpression> ParseArgumentList()
+        private IExpression ParseFunctionExpression()
+        {
+            IList<string> arguments = this.ParseArgumentNames();
+            this.Parse(TokenType.Separator, "{");
+            ICommand command = this.ParseCompositeCommand();
+            return new FunctionExpression(arguments.ToArray(), command);
+        }
+
+        private IList<IExpression> ParseArgumentList()
         {
             List<IExpression> expressions = new List<IExpression>();
 
@@ -369,7 +385,29 @@
             return expressions;
         }
 
-        private List<IExpression> ParseArrayArgumentList()
+        private IList<string> ParseArgumentNames()
+        {
+            List<string> names = new List<string>();
+
+            this.Parse(TokenType.Separator, "(");
+
+            while (this.TryPeekName())
+            {
+                string name = this.ParseName();
+                names.Add(name);
+
+                if (this.TryParse(TokenType.Separator, ")"))
+                    break;
+
+                this.Parse(TokenType.Separator, ",");
+            }
+
+            this.Parse(TokenType.Separator, ")");
+
+            return names;
+        }
+
+        private IList<IExpression> ParseArrayArgumentList()
         {
             List<IExpression> expressions = new List<IExpression>();
 
@@ -395,6 +433,9 @@
             if (token == null)
                 return null;
 
+            if (token.TokenType == TokenType.Name && token.Value == "function")
+                return ParseFunctionExpression();
+
             switch (token.TokenType)
             {
                 case TokenType.Separator:
@@ -404,6 +445,9 @@
                         this.Parse(TokenType.Separator, ")");
                         return expression;
                     }
+
+                    if (token.Value == "{")
+                        return this.ParseObjectExpression();
 
                     break;
                 case TokenType.Boolean:
@@ -432,7 +476,7 @@
 
                     if (this.TryParse(TokenType.Separator, "("))
                     {
-                        List<IExpression> arguments = this.ParseArgumentList();
+                        IList<IExpression> arguments = this.ParseArgumentList();
                         expr = new InvokeExpression(expr, arguments);
                     }
 
@@ -440,6 +484,28 @@
             }
 
             throw new UnexpectedTokenException(token);
+        }
+
+        private IExpression ParseObjectExpression()
+        {
+            IList<string> names = new List<string>();
+            IList<IExpression> expressions = new List<IExpression>();
+
+            while (!this.TryParse(TokenType.Separator, "}"))
+            {
+                if (names.Count > 0)
+                    this.Parse(TokenType.Separator, ",");
+
+                string name = this.ParseName();
+                this.Parse(TokenType.Separator, ":");
+                IExpression expression = this.ParseExpression();
+                names.Add(name);
+                expressions.Add(expression);
+            }
+
+            this.Parse(TokenType.Separator, "}");
+
+            return new ObjectExpression(names, expressions);
         }
 
         private ICommand ParseCompositeCommand()

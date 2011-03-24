@@ -44,3 +44,7 @@ Remove LocalVariableExpression, SetLocalVariableCommand
 VariableExpression
 ConcatenateExpression tests
 Remove variable offset from Parser, IContext, Context
+FunctionExpression with tests
+Closure in Function.Invoke
+ObjectExpression
+Parser.ParserObjectExpression

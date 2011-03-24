@@ -661,6 +661,44 @@
             Assert.AreEqual("Object", newexpr.TypeName);
         }
 
+        [TestMethod]
+        public void ParseEmptyFunction()
+        {
+            IExpression expression = ParseExpression("function() {}");
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(FunctionExpression));
+
+            FunctionExpression funexpr = (FunctionExpression)expression;
+
+            Assert.IsInstanceOfType(funexpr.Body, typeof(CompositeCommand));
+            Assert.AreEqual(0, funexpr.ParameterNames.Length);
+        }
+
+        [TestMethod]
+        public void ParseSimpleFunction()
+        {
+            IExpression expression = ParseExpression("function(x) { return x+1;}");
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(FunctionExpression));
+
+            FunctionExpression funexpr = (FunctionExpression)expression;
+
+            Assert.IsInstanceOfType(funexpr.Body, typeof(CompositeCommand));
+            Assert.AreEqual(1, funexpr.ParameterNames.Length);
+        }
+
+        [TestMethod]
+        public void ParseSimpleObject()
+        {
+            IExpression expression = ParseExpression("{ name: \"Adam\", age: 800 }");
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(ObjectExpression));
+
+            ObjectExpression objexpr = (ObjectExpression)expression;
+            Assert.AreEqual(2, objexpr.Names.Count);
+            Assert.AreEqual(2, objexpr.Expressions.Count);
+        }
+
         private IExpression ParseExpression(string text)
         {
             this.CreateParser(text);

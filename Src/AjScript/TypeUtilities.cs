@@ -12,13 +12,7 @@
 
         public static Type GetType(IContext context, string name)
         {
-            // TODO Review take type from Global
-            //object obj = context.GetGlobalValue(name);
-            object obj = null;
-
-            // TODO Review
-            //if (obj == null && Machine.Current != null)
-            //    obj = Machine.Current.Environment.GetValue(name);
+            object obj = context.GetValue(name);
 
             if (obj != null && obj is Type)
                 return (Type)obj;

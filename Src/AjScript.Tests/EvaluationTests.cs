@@ -134,6 +134,26 @@
             Assert.AreEqual(48, this.context.GetValue("y"));
         }
 
+        [TestMethod]
+        public void AddFunction()
+        {
+            Assert.AreEqual(3, EvaluateExpression("function (x) { return x+1;} (2)"));
+        }
+
+        [TestMethod]
+        public void DefineAndEvaluateAddFunction()
+        {
+            EvaluateCommands("var add1 = function (x) { return x+1;}; result = add1(2);");
+            Assert.AreEqual(3, this.context.GetValue("result"));
+        }
+
+        [TestMethod]
+        public void DefineAndEvaluateFunctionWithClosure()
+        {
+            EvaluateCommands("var addx = function (x) { return function(y) { return x+y;}; }; result = addx(2)(3);");
+            Assert.AreEqual(5, this.context.GetValue("result"));
+        }
+
         private void EvaluateCommands(string text)
         {
             Parser parser = new Parser(text);

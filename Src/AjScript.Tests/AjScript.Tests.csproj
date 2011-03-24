@@ -48,8 +48,12 @@
     <Compile Include="Expressions\ConstantExpressionTests.cs" />
     <Compile Include="Expressions\ConcatenateExpressionTests.cs" />
     <Compile Include="Expressions\ArrayExpressionTests.cs" />
+    <Compile Include="Expressions\ArithmeticExpressionTests.cs" />
+    <Compile Include="Expressions\NewExpressionTests.cs" />
+    <Compile Include="Expressions\FunctionExpressionTests.cs" />
     <Compile Include="ExpressionUtilitiesTests.cs" />
     <Compile Include="Language\DynamicObjectTests.cs" />
+    <Compile Include="Language\FunctionTests.cs" />
     <Compile Include="Primitives\ObjectFunctionTests.cs" />
     <Compile Include="Primitives\WriteFunctionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

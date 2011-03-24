@@ -42,7 +42,8 @@
 
         public object Invoke(IContext context, object @this, object[] arguments)
         {
-            IContext newctx = new Context(context);
+            // TODO review: any case for use context parameter?
+            IContext newctx = new Context(this.context);
 
             // Set this and arguments
             newctx.DefineVariable("this");
