@@ -8,12 +8,10 @@
     public class CompositeCommand : ICommand
     {
         private ICollection<ICommand> commands;
-        private int nvariables;
 
-        public CompositeCommand(ICollection<ICommand> commands, int nvariables)
+        public CompositeCommand(ICollection<ICommand> commands)
         {
             this.commands = commands;
-            this.nvariables = nvariables;
         }
 
         public int CommandCount { get { return this.commands.Count; } }

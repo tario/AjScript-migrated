@@ -41,12 +41,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CommandsTests.cs" />
-    <Compile Include="Commands\SetLocalVariableCommandTests.cs" />
     <Compile Include="Compiler\LexerTests.cs" />
     <Compile Include="Compiler\ParserTests.cs" />
     <Compile Include="ContextTests.cs" />
     <Compile Include="EvaluationTests.cs" />
     <Compile Include="Expressions\ConstantExpressionTests.cs" />
+    <Compile Include="Expressions\ConcatenateExpressionTests.cs" />
+    <Compile Include="Expressions\ArrayExpressionTests.cs" />
+    <Compile Include="ExpressionUtilitiesTests.cs" />
     <Compile Include="Language\DynamicObjectTests.cs" />
     <Compile Include="Primitives\ObjectFunctionTests.cs" />
     <Compile Include="Primitives\WriteFunctionTests.cs" />

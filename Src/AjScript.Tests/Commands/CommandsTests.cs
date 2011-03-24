@@ -19,154 +19,151 @@
         [TestMethod]
         public void ExecuteCompositeCommand()
         {
-            Context context = new Context(3);
+            Context context = new Context();
 
-            SetLocalVariableCommand command1 = new SetLocalVariableCommand(0, new ConstantExpression("bar"));
-            SetLocalVariableCommand command2 = new SetLocalVariableCommand(1, new ConstantExpression(1));
-            SetLocalVariableCommand command3 = new SetLocalVariableCommand(2, new LocalVariableExpression(0));
+            SetVariableCommand command1 = new SetVariableCommand("a", new ConstantExpression("bar"));
+            SetVariableCommand command2 = new SetVariableCommand("b", new ConstantExpression(1));
+            SetVariableCommand command3 = new SetVariableCommand("c", new VariableExpression("a"));
 
             List<ICommand> commands = new List<ICommand>();
             commands.Add(command1);
             commands.Add(command2);
             commands.Add(command3);
 
-            CompositeCommand command = new CompositeCommand(commands, 0);
-
-            context.SetValue(0, null);
-            context.SetValue(1, null);
+            CompositeCommand command = new CompositeCommand(commands);
 
             command.Execute(context);
 
-            Assert.AreEqual("bar", context.GetValue(0));
-            Assert.AreEqual(1, context.GetValue(1));
-            Assert.AreEqual("bar", context.GetValue(2));
+            Assert.AreEqual("bar", context.GetValue("a"));
+            Assert.AreEqual(1, context.GetValue("b"));
+            Assert.AreEqual("bar", context.GetValue("c"));
         }
 
         [TestMethod]
         public void ExecuteIfCommandWhenTrue()
         {
             IExpression condition = new ConstantExpression(true);
-            ICommand setCommand = new SetLocalVariableCommand(0, new ConstantExpression(1));
+            ICommand setCommand = new SetVariableCommand("a", new ConstantExpression(1));
             IfCommand command = new IfCommand(condition, setCommand);
 
-            Context context = new Context(1);
+            Context context = new Context();
 
             command.Execute(context);
 
-            Assert.AreEqual(1, context.GetValue(0));
+            Assert.AreEqual(1, context.GetValue("a"));
         }
 
         [TestMethod]
         public void ExecuteIfCommandWhenFalse()
         {
             IExpression condition = new ConstantExpression(false);
-            ICommand setCommand = new SetLocalVariableCommand(0, new ConstantExpression(1));
+            ICommand setCommand = new SetVariableCommand("a", new ConstantExpression(1));
             IfCommand command = new IfCommand(condition, setCommand);
 
-            Context context = new Context(1);
+            Context context = new Context();
 
             command.Execute(context);
 
-            Assert.AreEqual(Undefined.Instance, context.GetValue(0));
+            Assert.AreEqual(Undefined.Instance, context.GetValue("a"));
         }
 
         [TestMethod]
         public void ExecuteIfCommandElseWhenFalse()
         {
             IExpression condition = new ConstantExpression(false);
-            ICommand setXCommand = new SetLocalVariableCommand(0, new ConstantExpression(1));
-            ICommand setYCommand = new SetLocalVariableCommand(1, new ConstantExpression(2));
+            ICommand setXCommand = new SetVariableCommand("a", new ConstantExpression(1));
+            ICommand setYCommand = new SetVariableCommand("b", new ConstantExpression(2));
             IfCommand command = new IfCommand(condition, setXCommand, setYCommand);
 
-            Context context = new Context(2);
+            Context context = new Context();
 
             command.Execute(context);
 
-            Assert.AreEqual(Undefined.Instance, context.GetValue(0));
-            Assert.AreEqual(2, context.GetValue(1));
+            Assert.AreEqual(Undefined.Instance, context.GetValue("a"));
+            Assert.AreEqual(2, context.GetValue("b"));
         }
 
         [TestMethod]
         public void ExecuteWhileCommand()
         {
-            IExpression incrementX = new ArithmeticBinaryExpression(ArithmeticOperator.Add, new ConstantExpression(1), new LocalVariableExpression(0));
-            IExpression decrementY = new ArithmeticBinaryExpression(ArithmeticOperator.Subtract, new LocalVariableExpression(1), new ConstantExpression(1));
-            ICommand setX = new SetLocalVariableCommand(0, incrementX);
-            ICommand setY = new SetLocalVariableCommand(1, decrementY);
+            IExpression incrementX = new ArithmeticBinaryExpression(ArithmeticOperator.Add, new ConstantExpression(1), new VariableExpression("a"));
+            IExpression decrementY = new ArithmeticBinaryExpression(ArithmeticOperator.Subtract, new VariableExpression("b"), new ConstantExpression(1));
+            ICommand setX = new SetVariableCommand("a", incrementX);
+            ICommand setY = new SetVariableCommand("b", decrementY);
             List<ICommand> commands = new List<ICommand>();
             commands.Add(setX);
             commands.Add(setY);
-            ICommand command = new CompositeCommand(commands, 0);
-            IExpression yexpr = new LocalVariableExpression(1);
+            ICommand command = new CompositeCommand(commands);
+            IExpression yexpr = new VariableExpression("b");
 
             WhileCommand whilecmd = new WhileCommand(yexpr, command);
 
-            Context context = new Context(2);
+            Context context = new Context();
 
-            context.SetValue(0, 0);
-            context.SetValue(1, 5);
+            context.SetValue("a", 0);
+            context.SetValue("b", 5);
 
             whilecmd.Execute(context);
 
-            Assert.AreEqual(0, context.GetValue(1));
-            Assert.AreEqual(5, context.GetValue(0));
+            Assert.AreEqual(0, context.GetValue("b"));
+            Assert.AreEqual(5, context.GetValue("a"));
         }
 
         [TestMethod]
         public void ExecuteForEachCommand()
         {
-            IExpression addToX = new ArithmeticBinaryExpression(ArithmeticOperator.Add, new LocalVariableExpression(1), new LocalVariableExpression(0));
-            ICommand setX = new SetLocalVariableCommand(0, addToX);
+            IExpression addToX = new ArithmeticBinaryExpression(ArithmeticOperator.Add, new VariableExpression("b"), new VariableExpression("a"));
+            ICommand setX = new SetVariableCommand("a", addToX);
             IExpression values = new ConstantExpression(new int [] { 1, 2, 3 } );
 
-            ForEachCommand foreachcmd = new ForEachCommand(1, values, setX);
+            ForEachCommand foreachcmd = new ForEachCommand("b", values, setX);
 
-            Context context = new Context(2);
+            Context context = new Context();
 
-            context.SetValue(0, 0);
+            context.SetValue("a", 0);
 
             foreachcmd.Execute(context);
 
-            Assert.AreEqual(6, context.GetValue(0));
+            Assert.AreEqual(6, context.GetValue("a"));
         }
 
         [TestMethod]
         public void ExecuteForCommand()
         {
-            ICommand setX = new SetLocalVariableCommand(0, new ConstantExpression(0));
-            ICommand setY = new SetLocalVariableCommand(1, new ConstantExpression(0));
+            ICommand setX = new SetVariableCommand("x", new ConstantExpression(0));
+            ICommand setY = new SetVariableCommand("y", new ConstantExpression(0));
             List<ICommand> commands = new List<ICommand>();
             commands.Add(setX);
             commands.Add(setY);
-            ICommand initialCommand = new CompositeCommand(commands, 0);
+            ICommand initialCommand = new CompositeCommand(commands);
 
-            IExpression condition = new CompareExpression(ComparisonOperator.Less, new LocalVariableExpression(0), new ConstantExpression(6));
+            IExpression condition = new CompareExpression(ComparisonOperator.Less, new VariableExpression("x"), new ConstantExpression(6));
 
-            IExpression addXtoY = new ArithmeticBinaryExpression(ArithmeticOperator.Add, new LocalVariableExpression(1), new LocalVariableExpression(0));
-            ICommand addToY = new SetLocalVariableCommand(1, addXtoY);
+            IExpression addXtoY = new ArithmeticBinaryExpression(ArithmeticOperator.Add, new VariableExpression("y"), new VariableExpression("x"));
+            ICommand addToY = new SetVariableCommand("y", addXtoY);
 
-            ICommand endCommand = new SetLocalVariableCommand(0, new ArithmeticBinaryExpression(ArithmeticOperator.Add, new LocalVariableExpression(0), new ConstantExpression(1)));
+            ICommand endCommand = new SetVariableCommand("x", new ArithmeticBinaryExpression(ArithmeticOperator.Add, new VariableExpression("x"), new ConstantExpression(1)));
 
             ForCommand forcmd = new ForCommand(initialCommand, condition, endCommand, addToY);
 
-            Context context = new Context(2);
+            Context context = new Context();
 
-            context.SetValue(1, null);
+            context.SetValue("y", null);
 
             forcmd.Execute(context);
 
-            Assert.AreEqual(15, context.GetValue(1));
+            Assert.AreEqual(15, context.GetValue("y"));
         }
 
         [TestMethod]
         public void ExecuteSetLocalVariableCommandWithVariable()
         {
-            Context context = new Context(1);
-            SetLocalVariableCommand command = new SetLocalVariableCommand(0, new ConstantExpression("bar"));
+            Context context = new Context();
+            SetVariableCommand command = new SetVariableCommand("a", new ConstantExpression("bar"));
 
             command.Execute(context);
 
-            Assert.AreEqual("bar", context.GetValue(0));
+            Assert.AreEqual("bar", context.GetValue("a"));
         }
     }
 }

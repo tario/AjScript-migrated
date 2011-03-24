@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CompositeCommand.cs" />
+    <Compile Include="Commands\SetVariableCommand.cs" />
+    <Compile Include="Commands\VarCommand.cs" />
     <Compile Include="Commands\DefineFunctionCommand.cs" />
     <Compile Include="Commands\ExpressionCommand.cs" />
     <Compile Include="Commands\ForCommand.cs" />
@@ -57,7 +59,6 @@
     <Compile Include="Commands\ReturnCommand.cs" />
     <Compile Include="Commands\SetArrayCommand.cs" />
     <Compile Include="Commands\SetCommand.cs" />
-    <Compile Include="Commands\SetLocalVariableCommand.cs" />
     <Compile Include="Commands\SetValueCommand.cs" />
     <Compile Include="Commands\WhileCommand.cs" />
     <Compile Include="Compiler\EndOfInputException.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="Expressions\CompareExpression.cs" />
     <Compile Include="Expressions\ConcatenateExpression.cs" />
     <Compile Include="Expressions\ConstantExpression.cs" />
-    <Compile Include="Expressions\NamedVariableExpression.cs" />
+    <Compile Include="Expressions\VariableExpression.cs" />
     <Compile Include="Expressions\DotExpression.cs" />
     <Compile Include="Expressions\GetValueExpression.cs" />
     <Compile Include="Expressions\IExpression.cs" />
@@ -90,7 +91,6 @@
     <Compile Include="Expressions\NotExpression.cs" />
     <Compile Include="Expressions\OrExpression.cs" />
     <Compile Include="Expressions\UnaryExpression.cs" />
-    <Compile Include="Expressions\LocalVariableExpression.cs" />
     <Compile Include="ExpressionUtilities.cs" />
     <Compile Include="IContext.cs" />
     <Compile Include="Language\ArithmeticOperator.cs" />

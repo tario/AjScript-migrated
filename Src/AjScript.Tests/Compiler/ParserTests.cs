@@ -19,29 +19,6 @@
         private Parser parser;
 
         [TestMethod]
-        public void GetDefinedVariablesOffsets()
-        {
-            this.CreateParser("");
-
-            Assert.AreEqual(0, this.parser.GetVariableOffset("a"));
-            Assert.AreEqual(1, this.parser.GetVariableOffset("b"));
-            Assert.AreEqual(2, this.parser.GetVariableOffset("c"));
-            Assert.AreEqual(-1, this.parser.GetVariableOffset("x"));
-        }
-
-        [TestMethod]
-        public void DefineVariable()
-        {
-            this.CreateParser("");
-            this.parser.DefineVariable("x");
-
-            Assert.AreEqual(0, this.parser.GetVariableOffset("a"));
-            Assert.AreEqual(1, this.parser.GetVariableOffset("b"));
-            Assert.AreEqual(2, this.parser.GetVariableOffset("c"));
-            Assert.AreEqual(3, this.parser.GetVariableOffset("x"));
-        }
-
-        [TestMethod]
         public void ParseConstantExpressions()
         {
             IExpression expression;
@@ -90,10 +67,10 @@
             IExpression expression = ParseExpression("a");
 
             Assert.IsNotNull(expression);
-            Assert.IsInstanceOfType(expression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(expression, typeof(VariableExpression));
 
-            LocalVariableExpression varexpr = (LocalVariableExpression)expression;
-            Assert.AreEqual(0, varexpr.NVariable);
+            VariableExpression varexpr = (VariableExpression)expression;
+            Assert.AreEqual("a", varexpr.Name);
         }
 
         [TestMethod]
@@ -140,10 +117,10 @@
             IExpression expression = ParseExpression("b");
 
             Assert.IsNotNull(expression);
-            Assert.IsInstanceOfType(expression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(expression, typeof(VariableExpression));
 
-            LocalVariableExpression varexpr = (LocalVariableExpression)expression;
-            Assert.AreEqual(1, varexpr.NVariable);
+            VariableExpression varexpr = (VariableExpression)expression;
+            Assert.AreEqual("b", varexpr.Name);
         }
 
         [TestMethod]
@@ -151,17 +128,12 @@
         {
             ICommand command = ParseCommand("var x;");
 
-            Assert.AreEqual(3, this.parser.GetVariableOffset("x"));
             Assert.IsNotNull(command);
-            Assert.IsInstanceOfType(command, typeof(SetLocalVariableCommand));
+            Assert.IsInstanceOfType(command, typeof(VarCommand));
 
-            SetLocalVariableCommand setcmd = (SetLocalVariableCommand)command;
-            Assert.AreEqual(3, setcmd.NVariable);
-            Assert.IsInstanceOfType(setcmd.Expression, typeof(ConstantExpression));
-
-            ConstantExpression consexpr = (ConstantExpression)setcmd.Expression;
-
-            Assert.AreEqual(Undefined.Instance, consexpr.Value);
+            VarCommand varcmd = (VarCommand)command;
+            Assert.AreEqual("x", varcmd.Name);
+            Assert.IsNull(varcmd.Expression);
         }
 
         [TestMethod]
@@ -169,15 +141,14 @@
         {
             ICommand command = ParseCommand("var x = 1;");
 
-            Assert.AreEqual(3, this.parser.GetVariableOffset("x"));
             Assert.IsNotNull(command);
-            Assert.IsInstanceOfType(command, typeof(SetLocalVariableCommand));
+            Assert.IsInstanceOfType(command, typeof(VarCommand));
 
-            SetLocalVariableCommand setcmd = (SetLocalVariableCommand)command;
-            Assert.AreEqual(3, setcmd.NVariable);
-            Assert.IsInstanceOfType(setcmd.Expression, typeof(ConstantExpression));
+            VarCommand varcmd = (VarCommand)command;
+            Assert.AreEqual("x", varcmd.Name);
+            Assert.IsInstanceOfType(varcmd.Expression, typeof(ConstantExpression));
 
-            ConstantExpression consexpr = (ConstantExpression)setcmd.Expression;
+            ConstantExpression consexpr = (ConstantExpression)varcmd.Expression;
 
             Assert.AreEqual(1, consexpr.Value);
         }
@@ -194,7 +165,7 @@
 
             Assert.AreEqual(ArithmeticOperator.Add, operation.Operation);
             Assert.IsNotNull(operation.LeftExpression);
-            Assert.IsInstanceOfType(operation.LeftExpression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(operation.LeftExpression, typeof(VariableExpression));
             Assert.IsNotNull(operation.RightExpression);
             Assert.IsInstanceOfType(operation.RightExpression, typeof(ConstantExpression));
         }
@@ -211,7 +182,7 @@
 
             Assert.AreEqual(ArithmeticOperator.Modulo, operation.Operation);
             Assert.IsNotNull(operation.LeftExpression);
-            Assert.IsInstanceOfType(operation.LeftExpression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(operation.LeftExpression, typeof(VariableExpression));
             Assert.IsNotNull(operation.RightExpression);
             Assert.IsInstanceOfType(operation.RightExpression, typeof(ConstantExpression));
         }
@@ -228,7 +199,7 @@
 
             Assert.AreEqual(ComparisonOperator.LessEqual, operation.Operation);
             Assert.IsNotNull(operation.LeftExpression);
-            Assert.IsInstanceOfType(operation.LeftExpression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(operation.LeftExpression, typeof(VariableExpression));
             Assert.IsNotNull(operation.RightExpression);
             Assert.IsInstanceOfType(operation.RightExpression, typeof(ConstantExpression));
         }
@@ -245,9 +216,9 @@
 
             Assert.AreEqual(ArithmeticOperator.Add, operation.Operation);
             Assert.IsNotNull(operation.LeftExpression);
-            Assert.IsInstanceOfType(operation.LeftExpression, typeof(LocalVariableExpression));
-            LocalVariableExpression varexpr = (LocalVariableExpression)operation.LeftExpression;
-            Assert.AreEqual(0, varexpr.NVariable);
+            Assert.IsInstanceOfType(operation.LeftExpression, typeof(VariableExpression));
+            VariableExpression varexpr = (VariableExpression)operation.LeftExpression;
+            Assert.AreEqual("a", varexpr.Name);
             Assert.IsNotNull(operation.RightExpression);
             Assert.IsInstanceOfType(operation.RightExpression, typeof(ConstantExpression));
         }
@@ -281,7 +252,7 @@
 
             Assert.AreEqual(ArithmeticOperator.Add, arithmeticExpression.Operation);
             Assert.IsNotNull(arithmeticExpression.LeftExpression);
-            Assert.IsInstanceOfType(arithmeticExpression.LeftExpression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(arithmeticExpression.LeftExpression, typeof(VariableExpression));
             Assert.IsNotNull(arithmeticExpression.RightExpression);
             Assert.IsInstanceOfType(arithmeticExpression.RightExpression, typeof(ArithmeticBinaryExpression));
 
@@ -302,8 +273,8 @@
 
             SetCommand setcmd = (SetCommand)command;
 
-            Assert.IsInstanceOfType(setcmd.LeftValue, typeof(LocalVariableExpression));
-            Assert.AreEqual(0, ((LocalVariableExpression)setcmd.LeftValue).NVariable);
+            Assert.IsInstanceOfType(setcmd.LeftValue, typeof(VariableExpression));
+            Assert.AreEqual("a", ((VariableExpression)setcmd.LeftValue).Name);
             Assert.IsNotNull(setcmd.Expression);
             Assert.IsInstanceOfType(setcmd.Expression, typeof(ConstantExpression));
             Assert.AreEqual(1, setcmd.Expression.Evaluate(null));
@@ -387,12 +358,16 @@
             ICommand command = ParseCommand("for (var k in b) a=a+k;");
 
             Assert.IsNotNull(command);
-            Assert.IsInstanceOfType(command, typeof(ForEachCommand));
+            Assert.IsInstanceOfType(command, typeof(CompositeCommand));
 
-            ForEachCommand foreachcmd = (ForEachCommand) command;
+            IList<ICommand> cmds = ((CompositeCommand)command).Commands.ToList();
+            Assert.IsInstanceOfType(cmds[0], typeof(VarCommand));
+            Assert.IsInstanceOfType(cmds[1], typeof(ForEachCommand));
+
+            ForEachCommand foreachcmd = (ForEachCommand) cmds[1];
 
             Assert.IsNotNull(foreachcmd.Expression);
-            Assert.IsInstanceOfType(foreachcmd.Expression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(foreachcmd.Expression, typeof(VariableExpression));
             Assert.IsNotNull(foreachcmd.Command);
             Assert.IsInstanceOfType(foreachcmd.Command, typeof(SetCommand));
         }
@@ -403,12 +378,20 @@
             ICommand command = ParseCommand("for (var x in b) c=c+x;");
 
             Assert.IsNotNull(command);
-            Assert.IsInstanceOfType(command, typeof(ForEachCommand));
+            Assert.IsInstanceOfType(command, typeof(CompositeCommand));
 
-            ForEachCommand foreachcmd = (ForEachCommand)command;
+            CompositeCommand ccmd = (CompositeCommand)command;
+
+            Assert.AreEqual(2, ccmd.CommandCount);
+            IList<ICommand> cmds = ccmd.Commands.ToList();
+
+            Assert.IsInstanceOfType(cmds[0], typeof(VarCommand));
+            Assert.IsInstanceOfType(cmds[1], typeof(ForEachCommand));
+
+            ForEachCommand foreachcmd = (ForEachCommand)cmds[1];
 
             Assert.IsNotNull(foreachcmd.Expression);
-            Assert.IsInstanceOfType(foreachcmd.Expression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(foreachcmd.Expression, typeof(VariableExpression));
             Assert.IsNotNull(foreachcmd.Command);
             Assert.IsInstanceOfType(foreachcmd.Command, typeof(SetCommand));
         }
@@ -518,7 +501,7 @@
 
             Assert.AreEqual(IncrementOperator.PreIncrement, incexpr.Operator);
             Assert.IsNotNull(incexpr.Expression);
-            Assert.IsInstanceOfType(incexpr.Expression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(incexpr.Expression, typeof(VariableExpression));
         }
 
         [TestMethod]
@@ -548,7 +531,7 @@
 
             Assert.AreEqual(IncrementOperator.PostIncrement, incexpr.Operator);
             Assert.IsNotNull(incexpr.Expression);
-            Assert.IsInstanceOfType(incexpr.Expression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(incexpr.Expression, typeof(VariableExpression));
         }
 
         [TestMethod]
@@ -576,7 +559,7 @@
 
             SetArrayCommand setcmd = (SetArrayCommand) command;
 
-            Assert.IsInstanceOfType(setcmd.LeftValue, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(setcmd.LeftValue, typeof(VariableExpression));
             Assert.AreEqual(1, setcmd.Arguments.Count);
             Assert.IsInstanceOfType(setcmd.Expression, typeof(ConstantExpression));
         }
@@ -606,7 +589,7 @@
 
             NotExpression notexpr = (NotExpression)expression;
 
-            Assert.IsInstanceOfType(notexpr.Expression, typeof(LocalVariableExpression));
+            Assert.IsInstanceOfType(notexpr.Expression, typeof(VariableExpression));
         }
 
         [TestMethod]
@@ -703,9 +686,6 @@
         private void CreateParser(string text)
         {
             this.parser = new Parser(text);
-            this.parser.DefineVariable("a");
-            this.parser.DefineVariable("b");
-            this.parser.DefineVariable("c");
         }
     }
 }

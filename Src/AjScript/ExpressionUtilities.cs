@@ -13,15 +13,9 @@
     {
         public static void SetValue(IExpression expression, object value, IContext context)
         {
-            if (expression is LocalVariableExpression)
+            if (expression is VariableExpression)
             {
-                SetValue((LocalVariableExpression)expression, value, context);
-                return;
-            }
-
-            if (expression is NamedVariableExpression)
-            {
-                SetValue((NamedVariableExpression)expression, value, context);
+                SetValue((VariableExpression)expression, value, context);
                 return;
             }
 
@@ -36,8 +30,8 @@
 
         public static object ResolveToObject(IExpression expression, IContext context)
         {
-            if (expression is LocalVariableExpression)
-                return ResolveToObject((LocalVariableExpression)expression, context);
+            if (expression is VariableExpression)
+                return ResolveToObject((VariableExpression)expression, context);
 
             if (expression is DotExpression)
                 return ResolveToObject((DotExpression)expression, context);
@@ -47,8 +41,8 @@
 
         public static object ResolveToList(IExpression expression, IContext context)
         {
-            if (expression is LocalVariableExpression)
-                return ResolveToList((LocalVariableExpression)expression, context);
+            if (expression is VariableExpression)
+                return ResolveToList((VariableExpression)expression, context);
 
             if (expression is DotExpression)
                 return ResolveToList((DotExpression)expression, context);
@@ -58,8 +52,8 @@
 
         public static IDictionary ResolveToDictionary(IExpression expression, IContext context)
         {
-            if (expression is LocalVariableExpression)
-                return ResolveToDictionary((LocalVariableExpression)expression, context);
+            if (expression is VariableExpression)
+                return ResolveToDictionary((VariableExpression)expression, context);
 
             if (expression is DotExpression)
                 return ResolveToDictionary((DotExpression)expression, context);
@@ -67,20 +61,9 @@
             return (IDictionary)expression.Evaluate(context);
         }
 
-        private static void SetValue(LocalVariableExpression expression, object value, IContext context)
+        private static void SetValue(VariableExpression expression, object value, IContext context)
         {
-            context.SetValue(expression.NVariable, value);
-        }
-
-        private static void SetValue(NamedVariableExpression expression, object value, IContext context)
-        {
-            string name = expression.Name;
-            int nposition = context.GetVariableOffset(name);
-
-            if (nposition < 0)
-                nposition = context.DefineVariable(name);
-
-            context.SetValue(nposition, value);
+            context.SetValue(expression.Name, value);
         }
 
         private static void SetValue(DotExpression expression, object value, IContext context)
@@ -93,18 +76,18 @@
             ObjectUtilities.SetValue(obj, expression.Name, value);
         }
 
-        private static object ResolveToObject(LocalVariableExpression expression, IContext context)
+        private static object ResolveToObject(VariableExpression expression, IContext context)
         {
-            int nvariable = expression.NVariable;
+            string name = expression.Name;
 
-            object obj = context.GetValue(nvariable);
+            object obj = context.GetValue(name);
 
-            if (obj == null)
+            if (obj == null || obj == Undefined.Instance)
             {
                 obj = new DynamicObject();
 
                 // TODO Review if Local or not
-                context.SetValue(nvariable, obj);
+                context.SetValue(name, obj);
             }
 
             return obj;
@@ -120,7 +103,7 @@
 
                 obj = dynobj.GetValue(expression.Name);
 
-                if (obj == null)
+                if (obj == null || obj == Undefined.Instance)
                 {
                     obj = new DynamicObject();
                     dynobj.SetValue(expression.Name, obj);
@@ -132,18 +115,18 @@
             return ObjectUtilities.GetValue(obj, expression.Name);
         }
 
-        private static object ResolveToList(LocalVariableExpression expression, IContext context)
+        private static object ResolveToList(VariableExpression expression, IContext context)
         {
-            int nvariable = expression.NVariable;
+            string name = expression.Name;
 
-            object obj = context.GetValue(nvariable);
+            object obj = context.GetValue(name);
 
-            if (obj == null)
+            if (obj == null || obj == Undefined.Instance)
             {
                 obj = new ArrayList();
 
                 // TODO Review if Local or not
-                context.SetValue(nvariable, obj);
+                context.SetValue(name, obj);
             }
 
             return obj;
@@ -159,7 +142,7 @@
 
                 obj = dynobj.GetValue(expression.Name);
 
-                if (obj == null)
+                if (obj == null || obj == Undefined.Instance)
                 {
                     obj = new ArrayList();
                     dynobj.SetValue(expression.Name, obj);
@@ -171,18 +154,18 @@
             return (IList) ObjectUtilities.GetValue(obj, expression.Name);
         }
 
-        private static IDictionary ResolveToDictionary(LocalVariableExpression expression, IContext context)
+        private static IDictionary ResolveToDictionary(VariableExpression expression, IContext context)
         {
-            int nvariable = expression.NVariable;
+            string name = expression.Name;
 
-            object obj = context.GetValue(nvariable);
+            object obj = context.GetValue(name);
 
-            if (obj == null)
+            if (obj == null || obj == Undefined.Instance)
             {
                 obj = new Hashtable();
 
                 // TODO Review if Local or not
-                context.SetValue(nvariable, obj);
+                context.SetValue(name, obj);
             }
 
             return (IDictionary)obj;

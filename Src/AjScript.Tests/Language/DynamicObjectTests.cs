@@ -55,7 +55,7 @@
         [TestMethod]
         public void DefineMethod()
         {
-            ICommand body = new ReturnCommand(new NamedVariableExpression("Name"));
+            ICommand body = new ReturnCommand(new VariableExpression("Name"));
             Function function = new Function(null, body);
 
             Assert.AreEqual(0, function.Arity);
@@ -72,7 +72,7 @@
         [TestMethod]
         public void InvokeMethod()
         {
-            ICommand body = new ReturnCommand(new DotExpression(new LocalVariableExpression(0), "Name"));
+            ICommand body = new ReturnCommand(new DotExpression(new VariableExpression("this"), "Name"));
             Function function = new Function(null, body);
 
             Assert.AreEqual(0, function.Arity);
@@ -90,7 +90,7 @@
         [TestMethod]
         public void InvokeNativeMethod()
         {
-            ICommand body = new ReturnCommand(new NamedVariableExpression("Name"));
+            ICommand body = new ReturnCommand(new VariableExpression("Name"));
             Function function = new Function(null, body);
 
             Assert.AreEqual(0, function.Arity);

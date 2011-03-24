@@ -18,7 +18,7 @@
         [TestInitialize]
         public void Setup()
         {
-            this.context = new Context(0);
+            this.context = new Context();
         }
 
         [TestMethod]
@@ -136,7 +136,7 @@
 
         private void EvaluateCommands(string text)
         {
-            Parser parser = new Parser(text, this.context);
+            Parser parser = new Parser(text);
 
             for (ICommand cmd = parser.ParseCommand(); cmd != null; cmd = parser.ParseCommand())
                 cmd.Execute(this.context);
@@ -144,7 +144,7 @@
 
         private object EvaluateExpression(string text)
         {
-            Parser parser = new Parser(text, this.context);
+            Parser parser = new Parser(text);
             IExpression expression = parser.ParseExpression();
             Assert.IsNull(parser.ParseExpression());
             return expression.Evaluate(this.context);

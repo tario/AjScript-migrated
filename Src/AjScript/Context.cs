@@ -8,65 +8,44 @@
 
     public class Context : IContext
     {
-        private IList<object> values;
-        private Dictionary<string, int> positions;
+        private Dictionary<string, object> values;
         private IContext parent;
 
-        public Context(int nvariables)
-            : this(null, nvariables)
+        public Context()
+            : this(null)
         {
         }
 
-        public Context(IContext parent, int nvariables)
+        public Context(IContext parent)
         {
             this.parent = parent;
-            this.values = new List<object>(nvariables);
-
-            for (int k = 0; k < nvariables; k++)
-                this.values.Add(Undefined.Instance);
+            this.values = new Dictionary<string, object>();
         }
 
         public ReturnValue ReturnValue { get; set; }
 
-        public void SetValue(int nvariable, object value)
-        {
-            this.values[nvariable] = value;
-        }
-
-        public object GetValue(int nvariable)
-        {
-            return this.values[nvariable];
-        }
-
         public object GetValue(string name)
         {
-            if (this.positions == null || !this.positions.ContainsKey(name))
-                return Undefined.Instance;
+            if (!this.values.ContainsKey(name))
+                if (this.parent != null)
+                    return this.parent.GetValue(name);
+                else
+                    return Undefined.Instance;
 
-            return this.values[this.positions[name]];
+            return this.values[name];
         }
 
         public void SetValue(string name, object value)
         {
-            this.values[this.positions[name]] = value;
+            if (this.values.ContainsKey(name) || this.parent == null)
+                this.values[name] = value;
+            else
+                this.parent.SetValue(name, value);
         }
 
-        public int DefineVariable(string name)
+        public void DefineVariable(string name)
         {
-            if (this.positions == null)
-                this.positions = new Dictionary<string, int>();
-
-            this.positions[name] = this.values.Count;
-            this.values.Add(Undefined.Instance);
-            return this.positions[name];
-        }
-
-        public int GetVariableOffset(string name)
-        {
-            if (this.positions == null || !this.positions.ContainsKey(name))
-                return -1;
-
-            return this.positions[name];
+            this.values[name] =  Undefined.Instance;
         }
     }
 }

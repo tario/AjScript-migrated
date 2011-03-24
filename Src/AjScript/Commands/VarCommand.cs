@@ -1,38 +1,38 @@
 ﻿namespace AjScript.Commands
 {
     using System;
-    using System.Collections;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
 
     using AjScript.Expressions;
+    using AjScript.Language;
 
-    public class ForEachCommand : ICommand
+    public class VarCommand : ICommand
     {
         private string name;
         private IExpression expression;
-        private ICommand command;
 
-        public ForEachCommand(string name, IExpression expression, ICommand command)
+        public VarCommand(string name, IExpression expression)
         {
             this.name = name;
             this.expression = expression;
-            this.command = command;
         }
 
         public string Name { get { return this.name; } }
 
         public IExpression Expression { get { return this.expression; } }
 
-        public ICommand Command { get { return this.command; } }
-
         public void Execute(IContext context)
         {
-            foreach (object result in (IEnumerable)this.expression.Evaluate(context))
-            {
-                context.SetValue(this.name, result);
-                this.command.Execute(context);
-            }
+            context.DefineVariable(this.name);
+
+            if (this.expression == null)
+                return;
+
+            object value = this.expression.Evaluate(context);
+
+            context.SetValue(this.name, value);
         }
     }
 }

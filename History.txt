@@ -38,3 +38,9 @@ Print Initial Message in AjScript.Console
 Expression Evaluation Tests
 null, undefined as constant expressions
 
+2011-03-24
+VarCommand
+Remove LocalVariableExpression, SetLocalVariableCommand
+VariableExpression
+ConcatenateExpression tests
+Remove variable offset from Parser, IContext, Context

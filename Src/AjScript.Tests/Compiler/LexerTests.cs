@@ -88,7 +88,7 @@
         [TestMethod]
         public void ParseSeparators()
         {
-            ParseTokens("( ) [ ] ; ,", TokenType.Separator);
+            ParseTokens("( ) [ ] ; , :", TokenType.Separator);
         }
 
         [TestMethod]

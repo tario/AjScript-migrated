@@ -4,26 +4,29 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using AjScript.Expressions;
 
-    public class SetLocalVariableCommand : ICommand
+    using AjScript.Expressions;
+    using AjScript.Language;
+
+    public class SetVariableCommand : ICommand
     {
-        private int nvariable;
+        private string name;
         private IExpression expression;
 
-        public SetLocalVariableCommand(int nvariable, IExpression expression)
+        public SetVariableCommand(string name, IExpression expression)
         {
+            this.name = name;
             this.expression = expression;
-            this.nvariable = nvariable;
         }
 
-        public int NVariable { get { return this.nvariable; } }
+        public string Name { get { return this.name; } }
 
         public IExpression Expression { get { return this.expression; } }
 
         public void Execute(IContext context)
         {
-            context.SetValue(this.nvariable, this.expression.Evaluate(context));
+            object value = this.expression.Evaluate(context);
+            context.SetValue(this.name, value);
         }
     }
 }

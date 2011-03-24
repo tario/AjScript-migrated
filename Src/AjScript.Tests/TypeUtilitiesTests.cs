@@ -22,7 +22,7 @@
         [TestMethod]
         public void GetTypeInAnotherAssembly()
         {
-            Type type = TypeUtilities.GetType(new Context(0), "System.Data.DataSet");
+            Type type = TypeUtilities.GetType(new Context(), "System.Data.DataSet");
 
             Assert.IsNotNull(type);
             Assert.AreEqual(type, typeof(System.Data.DataSet));
@@ -32,7 +32,7 @@
         [ExpectedException(typeof(InvalidOperationException), "Unknown Type 'Foo.Bar'")]
         public void RaiseIfUnknownType()
         {
-            TypeUtilities.GetType(new Context(0), "Foo.Bar");
+            TypeUtilities.GetType(new Context(), "Foo.Bar");
         }
 
         [TestMethod]

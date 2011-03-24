@@ -10,17 +10,11 @@
     {
         ReturnValue ReturnValue { get; set;  }
 
-        void SetValue(int nvariable, object value);
-
         void SetValue(string name, object value);
-
-        object GetValue(int nvariable);
 
         object GetValue(string name);
 
-        int DefineVariable(string name);
-
-        int GetVariableOffset(string name);
+        void DefineVariable(string name);
     }
 }
 

@@ -42,22 +42,28 @@
 
         public object Invoke(IContext context, object @this, object[] arguments)
         {
-            int nvariables = this.Arity + 2;
-
-            IContext newctx = new Context(context, nvariables);
+            IContext newctx = new Context(context);
 
             // Set this and arguments
-            newctx.SetValue(0, @this);
-            newctx.SetValue(1, arguments);
+            newctx.DefineVariable("this");
+            newctx.SetValue("this", @this);
+            newctx.DefineVariable("arguments");
+            newctx.SetValue("arguments", arguments);
 
             for (int k = 0; arguments != null && k < arguments.Length && k < this.Arity; k++)
-                newctx.SetValue(k + 2, arguments[k]);
+            {
+                newctx.DefineVariable(parameterNames[k]);
+                newctx.SetValue(parameterNames[k], arguments[k]);
+            }
 
             this.Body.Execute(newctx);
 
-            // TODO return Undefined?
+            // TODO Review: return undefined it not this?
             if (newctx.ReturnValue == null)
-                return null;
+                if (@this != null)
+                    return @this;
+                else
+                    return Undefined.Instance;
 
             return newctx.ReturnValue.Value;
         }

@@ -14,32 +14,20 @@
     public class Parser : IDisposable
     {
         private Lexer lexer;
-        private IContext context;
 
         public Parser(string text)
-            : this(new Lexer(text), new Context(0))
+            : this(new Lexer(text))
         {
         }
 
         public Parser(TextReader reader)
-            : this(new Lexer(reader), new Context(0))
+            : this(new Lexer(reader))
         {
         }
 
-        public Parser(string text, IContext context)
-            : this(new Lexer(text), context)
-        {
-        }
-
-        public Parser(TextReader reader, IContext context)
-            : this(new Lexer(reader), context)
-        {
-        }
-
-        public Parser(Lexer lexer, IContext context)
+        public Parser(Lexer lexer)
         {
             this.lexer = lexer;
-            this.context = context;
         }
 
         public ICommand ParseCommand()
@@ -87,20 +75,10 @@
             return this.ParseBinaryLogicalExpressionLevelOne();
         }
 
-        public void DefineVariable(string name)
-        {
-            this.context.DefineVariable(name);
-        }
-
         public void Dispose()
         {
             if (this.lexer != null)
                 this.lexer.Dispose();
-        }
-
-        public int GetVariableOffset(string name)
-        {
-            return this.context.GetVariableOffset(name);
         }
 
         private ICommand ParseSimpleCommand()
@@ -450,12 +428,7 @@
                 case TokenType.Name:
                     IExpression expr = null;
 
-                    int nvariable = this.GetVariableOffset(token.Value);
-
-                    if (nvariable < 0)
-                        expr = new NamedVariableExpression(token.Value);
-                    else
-                        expr = new LocalVariableExpression(nvariable);
+                    expr = new VariableExpression(token.Value);
 
                     if (this.TryParse(TokenType.Separator, "("))
                     {
@@ -478,8 +451,7 @@
 
             this.lexer.NextToken();
 
-            // TODO Review: set no. of variables
-            return new CompositeCommand(commands, 0);
+            return new CompositeCommand(commands);
         }
 
         private ICommand ParseReturnCommand()
@@ -527,24 +499,27 @@
         private ICommand ParseForInCommand()
         {
             string name = this.ParseName();
+            bool isvar = false;
 
             if (name == "var")
             {
                 name = this.ParseName();
-                this.DefineVariable(name);
+                isvar = true;
             }
-
-            int nvariable = this.GetVariableOffset(name);
-
-            if (nvariable < 0)
-                throw new ParserException(string.Format("Undefined Variable {0}", name));
 
             this.Parse(TokenType.Name, "in");
             IExpression values = this.ParseExpression();
             this.Parse(TokenType.Separator, ")");
             ICommand command = this.ParseCommand();
 
-            return new ForEachCommand(nvariable, values, command);
+            ICommand forcmd = new ForEachCommand(name, values, command);
+
+            if (!isvar)
+                return forcmd;
+
+            ICommand cmds = new CompositeCommand(new List<ICommand>() { new VarCommand(name, null), forcmd });
+
+            return cmds;
         }
 
         private ICommand ParseForCommand()
@@ -583,7 +558,6 @@
         private ICommand ParseVarCommand()
         {
             string name = this.ParseName();
-            this.DefineVariable(name);
 
             IExpression expression = null;
 
@@ -592,14 +566,10 @@
                 this.lexer.NextToken();
                 expression = this.ParseExpression();
             }
-            else
-            {
-                expression = new ConstantExpression(Undefined.Instance);
-            }
 
             this.Parse(TokenType.Separator, ";");
 
-            return new SetLocalVariableCommand(this.GetVariableOffset(name), expression);
+            return new VarCommand(name, expression);
         }
 
         private void ParseMemberVariable(IList<string> memberNames, IList<IExpression> memberExpressions)
