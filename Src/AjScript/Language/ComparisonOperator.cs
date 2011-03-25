@@ -7,6 +7,7 @@
 
     public enum ComparisonOperator
     {
+        Unknown,
         Equal,
         NotEqual,
         Less,

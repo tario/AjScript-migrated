@@ -6,11 +6,16 @@
     using System.Text;
     using AjScript.Language;
 
-    public class ObjectFunction : IFunction
+    public class ObjectFunction : Function
     {
-        public object NewInstance(object[] parameters)
+        public ObjectFunction(IContext context)
+            : base(null, null, context)
         {
-            return new DynamicObject();
+        }
+
+        public override object NewInstance(object[] parameters)
+        {
+            return new DynamicObject(this);
         }
     }
 }

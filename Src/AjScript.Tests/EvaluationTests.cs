@@ -9,6 +9,7 @@
     using AjScript.Compiler;
     using AjScript.Commands;
     using AjScript.Expressions;
+    using AjScript.Primitives;
 
     [TestClass]
     public class EvaluationTests
@@ -19,6 +20,7 @@
         public void Setup()
         {
             this.context = new Context();
+            this.context.SetValue("Object", new ObjectFunction(this.context));
         }
 
         [TestMethod]
@@ -152,6 +154,37 @@
         {
             EvaluateCommands("var addx = function (x) { return function(y) { return x+y;}; }; result = addx(2)(3);");
             Assert.AreEqual(5, this.context.GetValue("result"));
+        }
+
+        [TestMethod]
+        public void NewObject()
+        {
+            object result = EvaluateExpression("new Object()");
+            Assert.IsNotNull(result);
+            Assert.IsInstanceOfType(result, typeof(IObject));
+        }
+
+        [TestMethod]
+        public void NewObjectUsingPrototype()
+        {
+            EvaluateCommands("var x = new Object(); Object.prototype.y = 10; result = x.y;");
+            Assert.AreEqual(10, this.context.GetValue("result"));
+        }
+
+        [TestMethod]
+        public void SetValueUsingArrayNotation()
+        {
+            EvaluateCommands("var x = new Object(); x['y'] = 10; result = x.y;");
+            Assert.AreEqual(10, this.context.GetValue("result"));
+        }
+
+        [TestMethod]
+        public void EvaluateSimpleBooleans()
+        {
+            Assert.AreEqual(true, EvaluateExpression("true && true"));
+            Assert.AreEqual(true, EvaluateExpression("false || true"));
+            Assert.AreEqual(false, EvaluateExpression("true && false"));
+            Assert.AreEqual(false, EvaluateExpression("false || false"));
         }
 
         private void EvaluateCommands(string text)

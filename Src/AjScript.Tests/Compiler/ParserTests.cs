@@ -595,7 +595,7 @@
         [TestMethod]
         public void ParseAndExpression()
         {
-            IExpression expression = ParseExpression("a==1 && b==1");
+            IExpression expression = ParseExpression("a===1 && b===1");
 
             Assert.IsNotNull(expression);
             Assert.IsInstanceOfType(expression, typeof(AndExpression));
@@ -609,7 +609,7 @@
         [TestMethod]
         public void ParseOrExpression()
         {
-            IExpression expression = ParseExpression("a==1 || b==1");
+            IExpression expression = ParseExpression("a===1 || b===1");
 
             Assert.IsNotNull(expression);
             Assert.IsInstanceOfType(expression, typeof(OrExpression));
@@ -623,7 +623,7 @@
         [TestMethod]
         public void ParseOrAndExpression()
         {
-            IExpression expression = ParseExpression("a==1 || b==1 && c==1");
+            IExpression expression = ParseExpression("a===1 || b===1 && c===1");
 
             Assert.IsNotNull(expression);
             Assert.IsInstanceOfType(expression, typeof(OrExpression));
@@ -637,7 +637,7 @@
         [TestMethod]
         public void ParseAndOrExpression()
         {
-            IExpression expression = ParseExpression("a==1 && b==1 || c==1");
+            IExpression expression = ParseExpression("a===1 && b===1 || c===1");
 
             Assert.IsNotNull(expression);
             Assert.IsInstanceOfType(expression, typeof(OrExpression));

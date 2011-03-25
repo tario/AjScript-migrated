@@ -8,7 +8,19 @@
     public class DynamicObject : IObject
     {
         private Dictionary<string, object> values = new Dictionary<string, object>();
-        private static string[] nativeMethods = new string[] { "SetValue", "GetValue", "ToString", "GetNames", "Invoke", "GetHashCode", "Equals", "Marshal" };
+        private static string[] nativeMethods = new string[] { "SetValue", "GetValue", "ToString", "GetNames", "Invoke", "GetHashCode", "Equals" };
+        private IFunction function;
+
+        public DynamicObject()
+        {
+        }
+
+        public DynamicObject(IFunction function)
+        {
+            this.function = function;
+        }
+
+        public IFunction Function { get { return this.function; } internal set { this.function = value; } }
 
         public virtual void SetValue(string name, object value)
         {
@@ -20,7 +32,15 @@
             if (this.values.ContainsKey(name))
                 return this.values[name];
 
-            return null;
+            if (this.function == null)
+                return Undefined.Instance;
+
+            object prototype = this.function.GetValue("prototype");
+
+            if (prototype == null || prototype == Undefined.Instance)
+                return Undefined.Instance;
+
+            return ((IObject)prototype).GetValue(name);
         }
 
         public virtual ICollection<string> GetNames()
@@ -37,10 +57,10 @@
         {
             object value = this.GetValue(name);
 
-            if (value == null && this.IsNativeMethod(name))
+            if ((value == null || value == Undefined.Instance) && this.IsNativeMethod(name))
                 return ObjectUtilities.GetNativeValue(this, name, parameters);
 
-            if (value == null)
+            if (value == null || value == Undefined.Instance)
                 throw new InvalidOperationException(string.Format("Unknown member '{0}'", name));
 
             if (!(value is ICallable))

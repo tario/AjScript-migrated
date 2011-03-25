@@ -42,6 +42,12 @@
 
             if (ObjectUtilities.IsNumber(indexes[0]))
                 obj = ExpressionUtilities.ResolveToList(this.leftValue, context);
+            else if (indexes.Length == 1)
+            {
+                IObject iobj = (IObject) ExpressionUtilities.ResolveToObject(this.leftValue, context);
+                iobj.SetValue(indexes[0].ToString(), value);
+                return;
+            }
             else
                 obj = ExpressionUtilities.ResolveToDictionary(this.leftValue, context);
 

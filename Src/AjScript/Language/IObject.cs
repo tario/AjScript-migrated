@@ -7,6 +7,8 @@
 
     public interface IObject
     {
+        IFunction Function { get; }
+
         object GetValue(string name);
 
         void SetValue(string name, object value);

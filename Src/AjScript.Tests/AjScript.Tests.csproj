@@ -44,6 +44,7 @@
     <Compile Include="Compiler\LexerTests.cs" />
     <Compile Include="Compiler\ParserTests.cs" />
     <Compile Include="ContextTests.cs" />
+    <Compile Include="FilesTests.cs" />
     <Compile Include="EvaluationTests.cs" />
     <Compile Include="Expressions\ConstantExpressionTests.cs" />
     <Compile Include="Expressions\ConcatenateExpressionTests.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="ExpressionUtilitiesTests.cs" />
     <Compile Include="Language\DynamicObjectTests.cs" />
     <Compile Include="Language\FunctionTests.cs" />
+    <Compile Include="PredicatesTests.cs" />
     <Compile Include="Primitives\ObjectFunctionTests.cs" />
     <Compile Include="Primitives\WriteFunctionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -65,6 +67,26 @@
       <Project>{4F0974B0-1331-4860-9462-B72A5A96FB81}</Project>
       <Name>AjScript</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Files\FunctionPrototypeMethod.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\FunctionGetStatus.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\ObjectWithPrivateValues.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\ObjectWithObjects.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\FunctionAddXWithClosure.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Files\FunctionAddOne.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

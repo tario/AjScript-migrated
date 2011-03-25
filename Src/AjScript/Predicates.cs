@@ -4,12 +4,16 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using AjScript.Language;
 
     public class Predicates
     {
         public static bool IsFalse(object obj)
         {
             if (obj == null)
+                return true;
+
+            if (obj == Undefined.Instance)
                 return true;
 
             if (obj is bool)

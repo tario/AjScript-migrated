@@ -14,7 +14,7 @@
         [TestMethod]
         public void NewInstance()
         {
-            ObjectFunction function = new ObjectFunction();
+            ObjectFunction function = new ObjectFunction(null);
             object instance = function.NewInstance(null);
 
             Assert.IsNotNull(instance);

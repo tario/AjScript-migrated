@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Text;
 
-    public interface IFunction
+    public interface IFunction : ICallable, IObject
     {
         object NewInstance(object[] parameters);
     }

@@ -19,7 +19,7 @@
             context.DefineVariable("writeln");
             context.SetValue("writeln", new WriteLineFunction());
             context.DefineVariable("Object");
-            context.SetValue("Object", new ObjectFunction());
+            context.SetValue("Object", new ObjectFunction(context));
 
             Console.WriteLine("AjScript 0.1 (JavaScript-like Interpreter in C#)");
 

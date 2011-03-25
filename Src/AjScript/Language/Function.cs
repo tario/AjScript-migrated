@@ -7,7 +7,7 @@
 
     using AjScript.Commands;
 
-    public class Function : ICallable
+    public class Function : DynamicObject, IFunction
     {
         private string[] parameterNames;
         private ICommand body;
@@ -21,6 +21,10 @@
 
         public Function(string[] parameterNames, ICommand body, IContext context)
         {
+            // TODO Review this cyclic reference
+            this.Function = this;
+
+            this.SetValue("prototype", new DynamicObject());
             this.parameterNames = parameterNames;
             this.body = body;
 
@@ -57,7 +61,9 @@
                 newctx.SetValue(parameterNames[k], arguments[k]);
             }
 
-            this.Body.Execute(newctx);
+            // TODO Review: it should be null?
+            if (this.Body != null)
+                this.Body.Execute(newctx);
 
             // TODO Review: return undefined it not this?
             if (newctx.ReturnValue == null)
@@ -67,6 +73,12 @@
                     return Undefined.Instance;
 
             return newctx.ReturnValue.Value;
+        }
+
+        public virtual object NewInstance(object[] parameters)
+        {
+            DynamicObject obj = new DynamicObject(this);
+            return this.Invoke(this.context, obj, parameters);
         }
     }
 }

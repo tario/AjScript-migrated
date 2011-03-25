@@ -181,7 +181,7 @@
 
                 obj = dynobj.GetValue(expression.Name);
 
-                if (obj == null)
+                if (obj == null || obj == Undefined.Instance)
                 {
                     obj = new Hashtable();
                     dynobj.SetValue(expression.Name, obj);

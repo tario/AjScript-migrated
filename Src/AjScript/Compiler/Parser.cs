@@ -198,12 +198,12 @@
             if (expression == null)
                 return null;
 
-            while (this.TryParse(TokenType.Operator, "<", ">", "==", ">=", "<=", "!="))
+            while (this.TryParse(TokenType.Operator, "<", ">", "==", ">=", "<=", "!=", "===", "!=="))
             {
                 Token oper = this.lexer.NextToken();
                 IExpression right = this.ParseBinaryExpressionFirstLevel();
 
-                ComparisonOperator op = 0;
+                ComparisonOperator op = ComparisonOperator.Unknown;
 
                 if (oper.Value == "<")
                     op = ComparisonOperator.Less;
@@ -213,10 +213,13 @@
                     op = ComparisonOperator.LessEqual;
                 if (oper.Value == ">=")
                     op = ComparisonOperator.GreaterEqual;
-                if (oper.Value == "==")
+                if (oper.Value == "===")
                     op = ComparisonOperator.Equal;
-                if (oper.Value == "!=")
+                if (oper.Value == "!==")
                     op = ComparisonOperator.NotEqual;
+
+                if (op == ComparisonOperator.Unknown)
+                    throw new ParserException(string.Format("Unknown operator '{0}'", oper.Value));
 
                 expression = new CompareExpression(op, expression, right);
             }
