@@ -672,6 +672,7 @@
 
             Assert.IsInstanceOfType(funexpr.Body, typeof(CompositeCommand));
             Assert.AreEqual(0, funexpr.ParameterNames.Length);
+            Assert.IsNull(funexpr.Name);
         }
 
         [TestMethod]
@@ -685,6 +686,35 @@
 
             Assert.IsInstanceOfType(funexpr.Body, typeof(CompositeCommand));
             Assert.AreEqual(1, funexpr.ParameterNames.Length);
+            Assert.IsNull(funexpr.Name);
+        }
+
+        [TestMethod]
+        public void ParseSimpleNamedFunction()
+        {
+            IExpression expression = ParseExpression("function add1(x) { return x+1;}");
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(FunctionExpression));
+
+            FunctionExpression funexpr = (FunctionExpression)expression;
+
+            Assert.IsInstanceOfType(funexpr.Body, typeof(FunctionBodyCommand));
+            Assert.AreEqual(1, funexpr.ParameterNames.Length);
+            Assert.AreEqual("add1", funexpr.Name);
+        }
+
+        [TestMethod]
+        public void ParseInnerFunctions()
+        {
+            IExpression expression = ParseExpression("function add1(x) { function bar() {} return x+1; function foo() {}}");
+            Assert.IsNotNull(expression);
+            Assert.IsInstanceOfType(expression, typeof(FunctionExpression));
+
+            FunctionExpression funexpr = (FunctionExpression)expression;
+
+            Assert.IsInstanceOfType(funexpr.Body, typeof(FunctionBodyCommand));
+            Assert.AreEqual(1, funexpr.ParameterNames.Length);
+            Assert.AreEqual("add1", funexpr.Name);
         }
 
         [TestMethod]

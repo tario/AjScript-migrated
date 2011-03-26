@@ -40,6 +40,13 @@
         }
 
         [TestMethod]
+        [DeploymentItem(@"Files\FunctionInnerAddXWithClosure.js")]
+        public void FunctionInnerAddXWithClosure()
+        {
+            Assert.AreEqual(5, this.EvaluateFile("FunctionInnerAddXWithClosure.js"));
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Files\ObjectWithObjects.js")]
         public void ObjectWithObjects()
         {

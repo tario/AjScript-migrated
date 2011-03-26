@@ -18,7 +18,7 @@
 
         public ICollection<ICommand> Commands { get { return this.commands; } }
 
-        public void Execute(IContext context)
+        public virtual void Execute(IContext context)
         {
             foreach (ICommand command in this.commands)
             {

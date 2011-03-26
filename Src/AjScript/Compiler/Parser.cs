@@ -13,6 +13,7 @@
 
     public class Parser : IDisposable
     {
+        private static readonly Token tokenSemiColon = new Token() { TokenType = TokenType.Separator, Value = ";" };
         private Lexer lexer;
 
         public Parser(string text)
@@ -116,6 +117,10 @@
                 this.lexer.NextToken();
                 return new SetValueCommand(expression, this.ParseExpression());
             }
+
+            // TODO Review trick to suppor function name(pars) {} without ending ;
+            if (expression is FunctionExpression && ((FunctionExpression)expression).Name != null)
+                this.lexer.PushToken(tokenSemiColon);
 
             return new ExpressionCommand(expression);
         }
@@ -361,12 +366,20 @@
             return new NewExpression(name, arguments);
         }
 
-        private IExpression ParseFunctionExpression()
+        private FunctionExpression ParseFunctionExpression()
         {
+            string name = null;
+            
+            if (this.TryPeekName())
+            {
+                Token token = this.lexer.NextToken();
+                name = token.Value;
+            }
+
             IList<string> arguments = this.ParseArgumentNames();
             this.Parse(TokenType.Separator, "{");
-            ICommand command = this.ParseCompositeCommand();
-            return new FunctionExpression(arguments.ToArray(), command);
+            ICommand command = this.ParseFunctionBodyCommand();
+            return new FunctionExpression(name, arguments.ToArray(), command);
         }
 
         private IList<IExpression> ParseArgumentList()
@@ -521,6 +534,27 @@
             this.lexer.NextToken();
 
             return new CompositeCommand(commands);
+        }
+
+        private ICommand ParseFunctionBodyCommand()
+        {
+            IList<ICommand> commands = new List<ICommand>();
+            IList<FunctionExpression> functions = new List<FunctionExpression>();
+
+            while (!this.TryParse(TokenType.Separator, "}"))
+            {
+                ICommand command = this.ParseCommand();
+
+                if (command is ExpressionCommand &&
+                    ((ExpressionCommand)command).Expression is FunctionExpression)
+                    functions.Add((FunctionExpression)((ExpressionCommand)command).Expression);
+                else
+                    commands.Add(command);
+            }
+
+            this.lexer.NextToken();
+
+            return new FunctionBodyCommand(commands, functions);
         }
 
         private ICommand ParseReturnCommand()

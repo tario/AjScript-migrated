@@ -48,3 +48,19 @@ FunctionExpression with tests
 Closure in Function.Invoke
 ObjectExpression
 Parser.ParserObjectExpression
+
+2011-03-25
+Prototype, first use and tests
+Function as DynamicObject
+IFunction as IObject
+Function with prototype
+PredicateTests
+FilesTests first version
+Operators === !== (no support for == != yet)
+x['y'] = value; with tests
+IsFalse(Undefined.Instance)
+
+2011-03-26
+FunctionBodyCommand
+Inner functions with tests
+

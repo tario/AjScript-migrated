@@ -15,7 +15,7 @@
         [TestMethod]
         public void EvaluateFunctionExpression()
         {
-            IExpression expression = new FunctionExpression(new string[] { "x" }, new ReturnCommand(new VariableExpression("x")));
+            IExpression expression = new FunctionExpression(null, new string[] { "x" }, new ReturnCommand(new VariableExpression("x")));
 
             object result = expression.Evaluate(new Context());
 
