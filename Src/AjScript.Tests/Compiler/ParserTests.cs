@@ -16,8 +16,6 @@
     [TestClass]
     public class ParserTests
     {
-        private Parser parser;
-
         [TestMethod]
         public void ParseConstantExpressions()
         {
@@ -133,7 +131,6 @@
 
             VarCommand varcmd = (VarCommand)command;
             Assert.AreEqual("x", varcmd.Name);
-            Assert.IsNull(varcmd.Expression);
         }
 
         [TestMethod]
@@ -142,13 +139,18 @@
             ICommand command = ParseCommand("var x = 1;");
 
             Assert.IsNotNull(command);
-            Assert.IsInstanceOfType(command, typeof(VarCommand));
+            Assert.IsInstanceOfType(command, typeof(CompositeCommand));
 
-            VarCommand varcmd = (VarCommand)command;
+            CompositeCommand composite = (CompositeCommand)command;
+            Assert.AreEqual(2, composite.CommandCount);
+            Assert.IsInstanceOfType(composite.Commands.First(), typeof(VarCommand));
+            VarCommand varcmd = (VarCommand)composite.Commands.First();
             Assert.AreEqual("x", varcmd.Name);
-            Assert.IsInstanceOfType(varcmd.Expression, typeof(ConstantExpression));
+            Assert.IsInstanceOfType(composite.Commands.ElementAt(1), typeof(SetVariableCommand));
+            SetVariableCommand setcmd = (SetVariableCommand)composite.Commands.ElementAt(1);
+            Assert.IsInstanceOfType(setcmd.Expression, typeof(ConstantExpression));
 
-            ConstantExpression consexpr = (ConstantExpression)varcmd.Expression;
+            ConstantExpression consexpr = (ConstantExpression)setcmd.Expression;
 
             Assert.AreEqual(1, consexpr.Value);
         }
@@ -698,7 +700,7 @@
 
             FunctionExpression funexpr = (FunctionExpression)expression;
 
-            Assert.IsInstanceOfType(funexpr.Body, typeof(FunctionBodyCommand));
+            Assert.IsInstanceOfType(funexpr.Body, typeof(CompositeCommand));
             Assert.AreEqual(1, funexpr.ParameterNames.Length);
             Assert.AreEqual("add1", funexpr.Name);
         }
@@ -712,7 +714,7 @@
 
             FunctionExpression funexpr = (FunctionExpression)expression;
 
-            Assert.IsInstanceOfType(funexpr.Body, typeof(FunctionBodyCommand));
+            Assert.IsInstanceOfType(funexpr.Body, typeof(CompositeCommand));
             Assert.AreEqual(1, funexpr.ParameterNames.Length);
             Assert.AreEqual("add1", funexpr.Name);
         }
@@ -729,31 +731,62 @@
             Assert.AreEqual(2, objexpr.Expressions.Count);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(ParserException))]
+        public void RaiseIfUseThisInAssignment()
+        {
+            ParseCommand("this = 1;");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ParserException))]
+        public void RaiseIfUseThisAsVariable()
+        {
+            ParseCommand("var this;");
+        }
+
+        [TestMethod]
+        public void HoistingVarCommands()
+        {
+            ICommand command = ParseCommands("x = 1; y=2; var x; var y;");
+            Assert.IsInstanceOfType(command, typeof(CompositeCommand));
+            CompositeCommand composite = (CompositeCommand)command;
+            Assert.AreEqual(2, composite.CommandCount);
+            Assert.AreEqual(2, composite.HoistedCommandCount);
+            Assert.IsInstanceOfType(composite.HoistedCommands.First(), typeof(VarCommand));
+        }
+
         private IExpression ParseExpression(string text)
         {
-            this.CreateParser(text);
+            Parser parser = CreateParser(text);
 
-            IExpression expression = this.parser.ParseExpression();
+            IExpression expression = parser.ParseExpression();
 
-            Assert.IsNull(this.parser.ParseExpression());
+            Assert.IsNull(parser.ParseExpression());
 
             return expression;
         }
 
         private ICommand ParseCommand(string text)
         {
-            this.CreateParser(text);
+            Parser parser = CreateParser(text);
 
-            ICommand command = this.parser.ParseCommand();
+            ICommand command = parser.ParseCommand();
 
-            Assert.IsNull(this.parser.ParseCommand());
+            Assert.IsNull(parser.ParseCommand());
 
             return command;
         }
 
-        private void CreateParser(string text)
+        private ICommand ParseCommands(string text)
         {
-            this.parser = new Parser(text);
+            Parser parser = CreateParser(text);
+            return parser.ParseCommands();
+        }
+
+        private Parser CreateParser(string text)
+        {
+            return new Parser(text);
         }
     }
 }

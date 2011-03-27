@@ -64,3 +64,8 @@ IsFalse(Undefined.Instance)
 FunctionBodyCommand
 Inner functions with tests
 
+2011-03-27
+Removed FunctionBodyCommand, SetValueCommand
+Reserved words for identifiers, WIP
+Catch errors: this = 1; var this; with tests
+Hoisted function and var

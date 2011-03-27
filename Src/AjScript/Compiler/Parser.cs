@@ -14,7 +14,9 @@
     public class Parser : IDisposable
     {
         private static readonly Token tokenSemiColon = new Token() { TokenType = TokenType.Separator, Value = ";" };
+        private static readonly string[] reserved = new string[] { "this", "null", "true", "false", "undefined" };
         private Lexer lexer;
+        private IList<ICommand> hoistedCommands = null;
 
         public Parser(string text)
             : this(new Lexer(text))
@@ -29,6 +31,26 @@
         public Parser(Lexer lexer)
         {
             this.lexer = lexer;
+        }
+
+        public ICommand ParseCommands()
+        {
+            IList<ICommand> commands = new List<ICommand>();
+            IList<ICommand> currentHoistedCommands = this.hoistedCommands;
+
+            try
+            {
+                this.hoistedCommands = new List<ICommand>();
+
+                for (ICommand cmd = this.ParseCommand(); cmd != null; cmd = this.ParseCommand())
+                    AddCommand(commands, cmd);
+
+                return new CompositeCommand(this.hoistedCommands, commands);
+            }
+            finally
+            {
+                this.hoistedCommands = currentHoistedCommands;
+            }
         }
 
         public ICommand ParseCommand()
@@ -107,15 +129,14 @@
                     command = new SetArrayCommand(aexpr.Expression, aexpr.Arguments, this.ParseExpression());
                 }
                 else
+                {
+                    if (expression is VariableExpression)
+                        IsValidName(((VariableExpression)expression).Name);
+
                     command = new SetCommand(expression, this.ParseExpression());
+                }
 
                 return command;
-            }
-
-            if (this.TryParse(TokenType.Operator, "<-"))
-            {
-                this.lexer.NextToken();
-                return new SetValueCommand(expression, this.ParseExpression());
             }
 
             // TODO Review trick to suppor function name(pars) {} without ending ;
@@ -376,10 +397,24 @@
                 name = token.Value;
             }
 
-            IList<string> arguments = this.ParseArgumentNames();
-            this.Parse(TokenType.Separator, "{");
-            ICommand command = this.ParseFunctionBodyCommand();
-            return new FunctionExpression(name, arguments.ToArray(), command);
+            IList<ICommand> currentHoistedCommands = this.hoistedCommands;
+            this.hoistedCommands = new List<ICommand>();
+
+            try
+            {
+                IList<string> arguments = this.ParseArgumentNames();
+                this.Parse(TokenType.Separator, "{");
+                CompositeCommand command = this.ParseCompositeCommand();
+                // TODO Review, should be 0
+                if (command.HoistedCommandCount > 0)
+                    throw new ParserException("Invalid command");
+                command = new CompositeCommand(this.hoistedCommands, command.Commands);
+                return new FunctionExpression(name, arguments.ToArray(), command);
+            }
+            finally
+            {
+                this.hoistedCommands = currentHoistedCommands;
+            }
         }
 
         private IList<IExpression> ParseArgumentList()
@@ -524,37 +559,24 @@
             return new ObjectExpression(names, expressions);
         }
 
-        private ICommand ParseCompositeCommand()
+        private CompositeCommand ParseCompositeCommand()
         {
             IList<ICommand> commands = new List<ICommand>();
 
             while (!this.TryParse(TokenType.Separator, "}"))
-                commands.Add(this.ParseCommand());
+                AddCommand(commands, this.ParseCommand());
 
             this.lexer.NextToken();
 
             return new CompositeCommand(commands);
         }
 
-        private ICommand ParseFunctionBodyCommand()
+        private void AddCommand(IList<ICommand> commands, ICommand command)
         {
-            IList<ICommand> commands = new List<ICommand>();
-            IList<FunctionExpression> functions = new List<FunctionExpression>();
-
-            while (!this.TryParse(TokenType.Separator, "}"))
-            {
-                ICommand command = this.ParseCommand();
-
-                if (command is ExpressionCommand &&
-                    ((ExpressionCommand)command).Expression is FunctionExpression)
-                    functions.Add((FunctionExpression)((ExpressionCommand)command).Expression);
-                else
-                    commands.Add(command);
-            }
-
-            this.lexer.NextToken();
-
-            return new FunctionBodyCommand(commands, functions);
+            if (this.hoistedCommands != null && IsHoistedCommand(command))
+                this.hoistedCommands.Add(command);
+            else if (!IsNoOperationCommand(command))
+                commands.Add(command);
         }
 
         private ICommand ParseReturnCommand()
@@ -620,7 +642,8 @@
             if (!isvar)
                 return forcmd;
 
-            ICommand cmds = new CompositeCommand(new List<ICommand>() { new VarCommand(name, null), forcmd });
+            // TODO review if var command should be hoisted
+            ICommand cmds = new CompositeCommand(new List<ICommand>() { new VarCommand(name), forcmd });
 
             return cmds;
         }
@@ -662,6 +685,8 @@
         {
             string name = this.ParseName();
 
+            IsValidName(name);
+
             IExpression expression = null;
 
             if (this.TryParse(TokenType.Operator, "="))
@@ -672,7 +697,18 @@
 
             this.Parse(TokenType.Separator, ";");
 
-            return new VarCommand(name, expression);
+            if (this.hoistedCommands != null)
+            {
+                this.hoistedCommands.Add(new VarCommand(name));
+                if (expression == null)
+                    return NoOperationCommand.Instance;
+                return new SetVariableCommand(name, expression);
+            }
+
+            if (expression == null)
+                return new VarCommand(name);
+
+            return new CompositeCommand(new List<ICommand>() { new VarCommand(name), new SetVariableCommand(name, expression) });
         }
 
         private void ParseMemberVariable(IList<string> memberNames, IList<IExpression> memberExpressions)
@@ -807,6 +843,42 @@
             }
 
             return name;
+        }
+
+        private static bool IsNoOperationCommand(ICommand command)
+        {
+            if (command == null)
+                return true;
+
+            if (command is CompositeCommand)
+            {
+                CompositeCommand composite = (CompositeCommand)command;
+                if (composite.CommandCount == 0)
+                    return true;
+            }
+
+            if (command == NoOperationCommand.Instance)
+                return true;
+
+            return false;
+        }
+
+        private static bool IsHoistedCommand(ICommand command)
+        {
+            if (command == null)
+                return false;
+            if (command is VarCommand)
+                return true;
+            if (command is ExpressionCommand && ((ExpressionCommand)command).Expression is FunctionExpression
+                && ((FunctionExpression)((ExpressionCommand)command).Expression).Name != null)
+                return true;
+            return false;
+        }
+
+        private void IsValidName(string name)
+        {
+            if (reserved.Contains(name))
+                throw new ParserException(string.Format("Invalid name '{0}'", name));
         }
     }
 }

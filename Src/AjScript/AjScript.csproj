@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\CompositeCommand.cs" />
-    <Compile Include="Commands\FunctionBodyCommand.cs" />
+    <Compile Include="Commands\NoOperationCommand.cs" />
     <Compile Include="Commands\SetVariableCommand.cs" />
     <Compile Include="Commands\VarCommand.cs" />
     <Compile Include="Commands\DefineFunctionCommand.cs" />
@@ -62,7 +62,6 @@
     <Compile Include="Commands\ReturnCommand.cs" />
     <Compile Include="Commands\SetArrayCommand.cs" />
     <Compile Include="Commands\SetCommand.cs" />
-    <Compile Include="Commands\SetValueCommand.cs" />
     <Compile Include="Commands\WhileCommand.cs" />
     <Compile Include="Compiler\EndOfInputException.cs" />
     <Compile Include="Compiler\ExpectedTokenException.cs" />
