@@ -69,3 +69,4 @@ Removed FunctionBodyCommand, SetValueCommand
 Reserved words for identifiers, WIP
 Catch errors: this = 1; var this; with tests
 Hoisted function and var
+Visitor and auxiliars, first tests and base implementations
