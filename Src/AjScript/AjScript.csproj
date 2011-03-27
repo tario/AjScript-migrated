@@ -56,6 +56,11 @@
     <Compile Include="Commands\ForEachCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\IfCommand.cs" />
+    <Compile Include="Compiler\BaseVisitor.cs" />
+    <Compile Include="Compiler\BaseVisitorProcessor.cs" />
+    <Compile Include="Compiler\IVisitor.cs" />
+    <Compile Include="Compiler\IVisitorContext.cs" />
+    <Compile Include="Compiler\IVisitorProcessor.cs" />
     <Compile Include="Expressions\ObjectExpression.cs" />
     <Compile Include="Expressions\FunctionExpression.cs" />
     <Compile Include="Expressions\NewExpression.cs" />
