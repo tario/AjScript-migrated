@@ -6,7 +6,7 @@
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using AjScript.Language;
-    using AjScript.Compiler;
+    using AjScript.Interpreter;
     using AjScript.Commands;
     using AjScript.Expressions;
     using AjScript.Primitives;

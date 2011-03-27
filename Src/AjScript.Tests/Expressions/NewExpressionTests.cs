@@ -7,7 +7,7 @@
     using AjScript.Expressions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.IO;
-    using AjScript.Compiler;
+    using AjScript.Interpreter;
 
     [TestClass]
     public class NewExpressionTests

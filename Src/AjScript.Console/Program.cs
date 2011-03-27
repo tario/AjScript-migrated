@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using AjScript.Compiler;
+    using AjScript.Interpreter;
     using AjScript.Commands;
     using AjScript.Primitives;
 
